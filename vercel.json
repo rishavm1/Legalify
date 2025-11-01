@@ -1,0 +1,26 @@
+{
+<<<<<<< HEAD
+  "version": 2,
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "functions": {
+    "app/api/**/*": {
+=======
+  "functions": {
+    "app/api/**/*.ts": {
+>>>>>>> c6bdffe9494c224c582eb687ffca3e5c6ae5a505
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "GOOGLE_AI_API_KEY": "@google_ai_api_key",
+    "NEXT_PUBLIC_OPENROUTER_API_KEY": "@openrouter_api_key",
+    "NEXTAUTH_SECRET": "@nextauth_secret",
+<<<<<<< HEAD
+    "AI_STRATEGY": "intelligent",
+    "NODE_ENV": "production"
+=======
+    "AI_STRATEGY": "intelligent"
+>>>>>>> c6bdffe9494c224c582eb687ffca3e5c6ae5a505
+  }
+}
