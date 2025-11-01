@@ -155,7 +155,7 @@ async function generateAIResponse(message: string, context: any): Promise<string
 
   // Check for previous chat history context
   const recentMessages = context.chatHistory.slice(-10);
-  const conversationContext = recentMessages.map(m => `${m.role}: ${m.content}`).join('\n');
+  const conversationContext = recentMessages.map((m: any) => `${m.role}: ${m.content}`).join('\n');
 
   // Handle specific instructions
   if (messageLower.includes('draft') || messageLower.includes('create') || messageLower.includes('write')) {
