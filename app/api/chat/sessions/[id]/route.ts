@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/db';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id?: string | string[] } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,8 +14,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const rawId = params.id;
-    const sessionId = Array.isArray(rawId) ? rawId[0] : rawId;
+    const { id: sessionId } = await params;
 
     if (!sessionId) {
       return NextResponse.json({ error: 'Missing session ID' }, { status: 400 });
