@@ -29,6 +29,9 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
+.env.production.check
+.env.vercel
 
 # vercel
 .vercel
@@ -48,4 +51,28 @@ next-env.d.ts
 .DS_Store
 Thumbs.db
 
-.vercel
+# Secrets and sensitive files
+*.txt
+secret.*
+nextauth-*
+*.bat
+
+# Unnecessary documentation
+*_GUIDE.md
+*_CHECKLIST.md
+*_FIX.md
+*_COMPLETE.md
+*_STEPS.md
+*_SUCCESS.md
+QUICK*.md
+START_HERE.md
+SETUP_*.md
+DEPLOYMENT_*.md
+README_DEPLOYMENT.md
+ARCHITECTURE.md
+SECURITY.md
+NETLIFY_DEPLOY.md
+THEME_IMPLEMENTATION.md
+LEGALIFY_V2_FEATURES.md
+FIXES_APPLIED.md
+GITHUB_PUBLISHED.md

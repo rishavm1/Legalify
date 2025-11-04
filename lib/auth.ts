@@ -5,10 +5,18 @@ import { supabaseAdmin } from './db';
 import bcrypt from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
     }),
     CredentialsProvider({
       id: 'email-password',
@@ -148,7 +156,11 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/auth/signin',
   },
+  session: {
+    strategy: 'jwt',
+  },
   theme: {
     colorScheme: 'dark',
   },
+  debug: process.env.NODE_ENV === 'development',
 };

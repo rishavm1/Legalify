@@ -6,21 +6,21 @@
 
 @layer base {
   * {
-    @apply border-neutral-800;
+    @apply border-neutral-300 dark:border-neutral-800;
   }
   body {
-    @apply bg-gradient-to-br from-black via-neutral-950 to-neutral-900 text-white;
+    @apply bg-white dark:bg-black text-black dark:text-white;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+    @apply bg-neutral-100 dark:bg-white/5 backdrop-blur-xl border border-neutral-300 dark:border-white/10;
   }
   
   .glass-sidebar {
-    @apply bg-neutral-900/80 backdrop-blur-xl border-r border-neutral-800/50;
+    @apply bg-neutral-100 dark:bg-neutral-900/80 backdrop-blur-xl border-r border-neutral-300 dark:border-neutral-800/50;
   }
   
   .premium-button {

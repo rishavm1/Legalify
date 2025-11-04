@@ -36,7 +36,8 @@ export async function POST(request: NextRequest) {
       });
 
     // Send OTP via email (using existing OTP service)
-    const otpResponse = await fetch(`${process.env.NEXTAUTH_URL}/api/otp/send`, {
+    const baseUrl = process.env.NEXTAUTH_URL?.trim() || 'https://legalifylunatics.vercel.app';
+    const otpResponse = await fetch(`${baseUrl}/api/otp/send`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

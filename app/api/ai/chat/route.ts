@@ -131,6 +131,10 @@ Your role:
 
 User Profile: ${context.userProfile.name || 'User'}
 
+IMPORTANT - When user asks to download a document:
+- Respond: "Sure! I've added download buttons below the document. Click 'Download Word' or 'Download PDF' to save it."
+- Be brief and direct
+
 Always:
 ✅ Be specific and actionable
 ✅ Ask for necessary information
@@ -142,7 +146,8 @@ Never:
 ❌ Give vague responses
 ❌ Say "I can help" without explaining how
 ❌ Ignore user's specific requests
-❌ Provide generic legal advice`;
+❌ Provide generic legal advice
+❌ Say you cannot download - instead guide them to copy the text`;
 }
 
 async function generateAIResponse(message: string, context: any): Promise<string> {

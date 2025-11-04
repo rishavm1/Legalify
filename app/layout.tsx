@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SessionProvider } from "@/components/session-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "Legalify - AI Legal Document Drafter",
@@ -13,11 +14,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
-        <div className="fade-in">
-          <SessionProvider>{children}</SessionProvider>
-        </div>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <div className="fade-in">
+            <SessionProvider>{children}</SessionProvider>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
