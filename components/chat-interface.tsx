@@ -328,7 +328,7 @@ export function ChatInterface() {
           </div>
           <Button 
             onClick={createNewSession}
-            className="premium-button w-full bg-white dark:bg-neutral-900 hover:bg-neutral-100 dark:hover:bg-black text-black dark:text-white font-semibold shadow-xl rounded-xl h-12 border border-neutral-300 dark:border-neutral-700"
+            className="premium-button w-full bg-white hover:bg-neutral-100 text-black font-semibold shadow-xl rounded-xl h-12 border border-neutral-300"
           >
             <Plus className="w-5 h-5 mr-2" />
             New Chat

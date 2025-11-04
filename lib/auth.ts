@@ -76,15 +76,11 @@ export const authOptions: NextAuthOptions = {
 
           await supabaseAdmin.from('otps').delete().eq('id', otpRecord.id);
 
-          // Mark user as verified and return for username creation
+          // Mark user as verified
           await supabaseAdmin
             .from('users')
-            .upsert({ 
-              email: credentials.email, 
-              is_verified: true 
-            }, { 
-              onConflict: 'email' 
-            });
+            .update({ is_verified: true })
+            .eq('email', credentials.email);
 
           return { 
             id: credentials.email, 
