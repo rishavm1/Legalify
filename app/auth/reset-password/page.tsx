@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Eye, EyeOff, Shield } from "lucide-react";
+import { Loader2, Eye, EyeOff, Shield, Check, X } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
@@ -18,6 +18,8 @@ function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [otpExpiresAt] = useState<number>(Date.now() + 10 * 60 * 1000);
+  const [timeRemaining, setTimeRemaining] = useState<number>(600);
 
   useEffect(() => {
     setMounted(true);
@@ -26,6 +28,32 @@ function ResetPasswordForm() {
       setEmail(emailParam);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, Math.floor((otpExpiresAt - Date.now()) / 1000));
+      setTimeRemaining(remaining);
+      if (remaining === 0) {
+        clearInterval(interval);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [otpExpiresAt]);
+
+  const getPasswordStrength = () => {
+    const checks = {
+      length: newPassword.length >= 8,
+      uppercase: /[A-Z]/.test(newPassword),
+      lowercase: /[a-z]/.test(newPassword),
+      number: /[0-9]/.test(newPassword),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(newPassword)
+    };
+    const score = Object.values(checks).filter(Boolean).length;
+    return { checks, score };
+  };
+
+  const passwordStrength = getPasswordStrength();
+  const isPasswordValid = passwordStrength.score >= 4;
 
   if (!mounted) {
     return (
@@ -134,6 +162,16 @@ function ResetPasswordForm() {
               className="w-full px-4 py-3 glass-card border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-2 focus:ring-amber-400/20 transition-all duration-300 font-medium text-center text-2xl tracking-widest"
               suppressHydrationWarning
             />
+            {timeRemaining > 0 ? (
+              <div className="flex items-center justify-center gap-2 mt-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-green-500 text-sm font-medium">
+                  Expires in {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
+                </span>
+              </div>
+            ) : (
+              <p className="text-red-500 text-sm text-center mt-3">Code expired. Please request a new one.</p>
+            )}
           </div>
 
           <div>
@@ -157,6 +195,30 @@ function ResetPasswordForm() {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
+            {newPassword && (
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center gap-2 text-xs">
+                  {passwordStrength.checks.length ? <Check size={14} className="text-green-500" /> : <X size={14} className="text-red-500" />}
+                  <span className={passwordStrength.checks.length ? "text-green-500" : "text-neutral-400"}>At least 8 characters</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  {passwordStrength.checks.uppercase ? <Check size={14} className="text-green-500" /> : <X size={14} className="text-red-500" />}
+                  <span className={passwordStrength.checks.uppercase ? "text-green-500" : "text-neutral-400"}>One uppercase letter</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  {passwordStrength.checks.lowercase ? <Check size={14} className="text-green-500" /> : <X size={14} className="text-red-500" />}
+                  <span className={passwordStrength.checks.lowercase ? "text-green-500" : "text-neutral-400"}>One lowercase letter</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  {passwordStrength.checks.number ? <Check size={14} className="text-green-500" /> : <X size={14} className="text-red-500" />}
+                  <span className={passwordStrength.checks.number ? "text-green-500" : "text-neutral-400"}>One number</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  {passwordStrength.checks.special ? <Check size={14} className="text-green-500" /> : <X size={14} className="text-red-500" />}
+                  <span className={passwordStrength.checks.special ? "text-green-500" : "text-neutral-400"}>One special character</span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div>
@@ -196,7 +258,7 @@ function ResetPasswordForm() {
 
           <Button
             onClick={handleResetPassword}
-            disabled={loading || !otp || !newPassword || !confirmPassword}
+            disabled={loading || !otp || !newPassword || !confirmPassword || !isPasswordValid || timeRemaining === 0}
             className="premium-button w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black h-12 font-bold shadow-lg hover:shadow-amber-400/25"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Reset Password"}

@@ -3,7 +3,7 @@
 import { signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff, Check, X } from "lucide-react";
 import Link from "next/link";
 
 export default function SignUp() {
@@ -17,6 +17,8 @@ export default function SignUp() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [otpExpiresAt, setOtpExpiresAt] = useState<number | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<number>(0);
 
   useEffect(() => {
     // Clean up any browser extension attributes that might cause hydration issues
@@ -26,6 +28,34 @@ export default function SignUp() {
     };
     cleanupExtensionAttributes();
   }, []);
+
+  useEffect(() => {
+    if (otpExpiresAt) {
+      const interval = setInterval(() => {
+        const remaining = Math.max(0, Math.floor((otpExpiresAt - Date.now()) / 1000));
+        setTimeRemaining(remaining);
+        if (remaining === 0) {
+          clearInterval(interval);
+        }
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [otpExpiresAt]);
+
+  const getPasswordStrength = () => {
+    const checks = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /[0-9]/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+    const score = Object.values(checks).filter(Boolean).length;
+    return { checks, score };
+  };
+
+  const passwordStrength = getPasswordStrength();
+  const isPasswordValid = passwordStrength.score >= 4;
 
   const handleEmailSignup = async () => {
     if (password !== confirmPassword) {
@@ -57,6 +87,7 @@ export default function SignUp() {
         });
         
         if (otpRes.ok) {
+          setOtpExpiresAt(Date.now() + 10 * 60 * 1000);
           setStep("verify");
         } else {
           setError("Failed to send verification email");
@@ -181,6 +212,30 @@ export default function SignUp() {
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
+                {password && (
+                  <div className="mt-3 space-y-2">
+                    <div className="flex items-center gap-2 text-xs">
+                      {passwordStrength.checks.length ? <Check size={14} className="text-green-500" /> : <X size={14} className="text-red-500" />}
+                      <span className={passwordStrength.checks.length ? "text-green-500" : "text-neutral-400"}>At least 8 characters</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      {passwordStrength.checks.uppercase ? <Check size={14} className="text-green-500" /> : <X size={14} className="text-red-500" />}
+                      <span className={passwordStrength.checks.uppercase ? "text-green-500" : "text-neutral-400"}>One uppercase letter</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      {passwordStrength.checks.lowercase ? <Check size={14} className="text-green-500" /> : <X size={14} className="text-red-500" />}
+                      <span className={passwordStrength.checks.lowercase ? "text-green-500" : "text-neutral-400"}>One lowercase letter</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      {passwordStrength.checks.number ? <Check size={14} className="text-green-500" /> : <X size={14} className="text-red-500" />}
+                      <span className={passwordStrength.checks.number ? "text-green-500" : "text-neutral-400"}>One number</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      {passwordStrength.checks.special ? <Check size={14} className="text-green-500" /> : <X size={14} className="text-red-500" />}
+                      <span className={passwordStrength.checks.special ? "text-green-500" : "text-neutral-400"}>One special character</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -211,7 +266,7 @@ export default function SignUp() {
 
               <Button
                 onClick={handleEmailSignup}
-                disabled={loading || !email || !password || !confirmPassword}
+                disabled={loading || !email || !password || !confirmPassword || !isPasswordValid}
                 className="w-full bg-white text-black hover:bg-neutral-200 h-12"
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Verify Email"}
@@ -235,9 +290,19 @@ export default function SignUp() {
             <>
               <div className="text-center">
                 <h3 className="text-xl font-semibold text-white mb-2">Check Your Email</h3>
-                <p className="text-neutral-400 text-sm mb-6">
+                <p className="text-neutral-400 text-sm mb-2">
                   We've sent a verification code to {email}
                 </p>
+                {timeRemaining > 0 ? (
+                  <div className="inline-flex items-center gap-2 bg-neutral-800 px-4 py-2 rounded-lg mb-4">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-green-500 text-sm font-medium">
+                      Expires in {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
+                    </span>
+                  </div>
+                ) : (
+                  <p className="text-red-500 text-sm mb-4">Code expired. Please request a new one.</p>
+                )}
               </div>
 
               <div>
