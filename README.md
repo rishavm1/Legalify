@@ -484,7 +484,7 @@ This software is proprietary and confidential. Unauthorized copying, modificatio
 See [LICENSE](LICENSE) file for full terms.
 
 **Copyright © 2024 Legalify Team**
-- Rishabh Verma
+- Rishav Mani
 - Anirban Chowdhury
 - Shantanu Raj
 
