@@ -626,7 +626,6 @@ This is a proprietary project. Contributions are only accepted from authorized t
 
 ## 💡 Fun Facts
 
-- 🚀 Built in 6 months
 - ☕ Powered by countless cups of coffee
 - 🌙 Most code written at 2 AM
 - 🎯 Mission: Help 1.4 billion people
