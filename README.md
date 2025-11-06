@@ -12,7 +12,7 @@
 ## 👥 Development Team
 
 **Core Contributors:**
-- **[Rishav Mani](https://github.com/rishavm1)** - Lead Developer & Architect
+- **[Rishav Mani](https://github.com/rishavm1)** 
 - **[Anirban Chowdhury](https://github.com/biriyani4ever-one)** - Co-Developer
 - **[Shantanu Raj](https://github.com/shantanuraj5002-art)** - Co-Developer
 
