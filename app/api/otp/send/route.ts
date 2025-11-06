@@ -9,6 +9,10 @@ export async function POST(req: NextRequest) {
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     if (email) {
+      // Delete any existing OTPs for this email
+      await supabaseAdmin.from('otps').delete().eq('email', email);
+      
+      // Insert new OTP
       await supabaseAdmin.from('otps').insert({
         email,
         otp,

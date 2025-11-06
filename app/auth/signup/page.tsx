@@ -330,17 +330,47 @@ export default function SignUp() {
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Verify & Continue"}
               </Button>
 
-              <Button
-                onClick={() => {
-                  setStep("form");
-                  setError("");
-                  setOtp("");
-                }}
-                variant="outline"
-                className="w-full bg-transparent border-neutral-700 text-neutral-400 hover:bg-neutral-800"
-              >
-                Back
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={async () => {
+                    setLoading(true);
+                    setError("");
+                    try {
+                      const otpRes = await fetch("/api/otp/send", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email }),
+                      });
+                      if (otpRes.ok) {
+                        setOtpExpiresAt(Date.now() + 10 * 60 * 1000);
+                        setOtp("");
+                        setError("");
+                      } else {
+                        setError("Failed to resend OTP");
+                      }
+                    } catch (err) {
+                      setError("Failed to resend OTP");
+                    }
+                    setLoading(false);
+                  }}
+                  variant="outline"
+                  disabled={loading}
+                  className="flex-1 bg-transparent border-neutral-700 text-neutral-400 hover:bg-neutral-800"
+                >
+                  Resend OTP
+                </Button>
+                <Button
+                  onClick={() => {
+                    setStep("form");
+                    setError("");
+                    setOtp("");
+                  }}
+                  variant="outline"
+                  className="flex-1 bg-transparent border-neutral-700 text-neutral-400 hover:bg-neutral-800"
+                >
+                  Back
+                </Button>
+              </div>
             </>
           )}
         </div>

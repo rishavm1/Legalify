@@ -18,7 +18,22 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (existingUser) {
-      return NextResponse.json({ error: 'User already exists' }, { status: 400 });
+      // If user exists but is not verified, allow re-signup (update password)
+      if (!existingUser.is_verified) {
+        const passwordHash = await bcrypt.hash(password, 12);
+        await supabaseAdmin
+          .from('users')
+          .update({ password_hash: passwordHash })
+          .eq('email', email);
+        
+        return NextResponse.json({ 
+          success: true, 
+          message: 'Account found. Please verify your email.' 
+        });
+      }
+      
+      // User exists and is verified
+      return NextResponse.json({ error: 'User already exists. Please sign in.' }, { status: 400 });
     }
 
     // Hash password
