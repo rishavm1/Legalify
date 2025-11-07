@@ -99,32 +99,51 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       if (account?.provider === 'google') {
         try {
-          const { data: existingUser } = await supabaseAdmin
+          const { data: existingUser, error: fetchError } = await supabaseAdmin
             .from('users')
             .select('*')
             .eq('email', user.email)
-            .single();
+            .maybeSingle();
           
           if (!existingUser) {
-            const { data: newUser } = await supabaseAdmin.from('users').insert({
-              email: user.email,
-              name: user.name,
-              image: user.image,
-              provider: 'google',
-              is_verified: true,
-            }).select().single();
+            // Create new user
+            const { data: newUser, error: insertError } = await supabaseAdmin
+              .from('users')
+              .insert({
+                email: user.email,
+                name: user.name,
+                username: user.name?.replace(/\s+/g, '').toLowerCase() || user.email?.split('@')[0],
+                image: user.image,
+                provider: 'google',
+                is_verified: true,
+              })
+              .select()
+              .single();
+            
+            if (insertError) {
+              console.error('Error creating user:', insertError);
+              return false;
+            }
             
             if (newUser) {
               user.id = newUser.id;
             }
           } else {
+            // Existing user
             user.id = existingUser.id;
+            
+            // Auto-generate username if missing
             if (!existingUser.username) {
-              (user as any).needsUsername = true;
+              const autoUsername = user.name?.replace(/\s+/g, '').toLowerCase() || user.email?.split('@')[0];
+              await supabaseAdmin
+                .from('users')
+                .update({ username: autoUsername })
+                .eq('id', existingUser.id);
             }
           }
         } catch (error) {
           console.error('Supabase error during sign in:', error);
+          return false;
         }
       }
       return true;
@@ -151,6 +170,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/auth/signin',
+    error: '/auth/signin',
   },
   session: {
     strategy: 'jwt',
