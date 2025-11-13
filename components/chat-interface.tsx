@@ -37,7 +37,7 @@ export function ChatInterface() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const [showDownloadButtons, setShowDownloadButtons] = useState<Set<string>>(new Set());
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -315,7 +315,7 @@ export function ChatInterface() {
   return (
     <div className="flex h-screen bg-white dark:bg-black text-black dark:text-white">
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-80' : 'w-0'} bg-neutral-100 dark:bg-neutral-900 flex flex-col shadow-2xl border-r border-neutral-200 dark:border-neutral-800 transition-all duration-300 overflow-hidden`}>
+      <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} fixed md:relative inset-y-0 left-0 z-50 w-80 bg-neutral-100 dark:bg-neutral-900 flex flex-col shadow-2xl border-r border-neutral-200 dark:border-neutral-800 transition-transform duration-300 md:translate-x-0`}>
         <div className="p-6 border-b border-neutral-200 dark:border-white/10">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
@@ -580,10 +580,10 @@ export function ChatInterface() {
                       <div className="inline-flex items-center justify-center w-24 h-24 bg-white dark:bg-neutral-800 rounded-3xl mb-6 shadow-2xl">
                         <Scale className="w-12 h-12 text-black" />
                       </div>
-                      <h1 className="text-5xl font-bold text-white mb-3">
+                      <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">
                         Welcome to Legalify
                       </h1>
-                      <p className="text-2xl text-black dark:text-neutral-300 mb-3 font-medium">Your AI Legal Assistant for Indian Law</p>
+                      <p className="text-lg md:text-2xl text-black dark:text-neutral-300 mb-3 font-medium">Your AI Legal Assistant for Indian Law</p>
                       <p className="text-base text-black dark:text-neutral-400">Empowering justice for everyone, without expensive lawyers</p>
                     </div>
 
@@ -748,7 +748,7 @@ export function ChatInterface() {
             </div>
 
             {/* Input Area */}
-            <div className="border-t border-white/10 p-6 bg-gradient-to-r from-black/50 to-neutral-900/50 backdrop-blur-xl">
+            <div className="border-t border-white/10 p-4 md:p-6 bg-gradient-to-r from-black/50 to-neutral-900/50 backdrop-blur-xl">
               <div className="flex items-center space-x-3 mb-4">
                 <Button
                   onClick={() => setShowAgreementWorkflow(true)}
