@@ -348,11 +348,12 @@ I'll analyze your situation and provide advice based on Indian law.`;
 async function handleResearchRequest(message: string, context: string): Promise<string> {
   try {
     const research = await citationSystem.conductResearch(message);
+    const bibliography = citationSystem.generateBibliography(research.citations);
     return `📚 **Legal Research Results**
 
 ${research.summary}
 
-${research.bibliography}
+${bibliography}
 
 **Confidence Level**: ${(research.confidence * 100).toFixed(0)}%
 
