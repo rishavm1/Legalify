@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/db';
 import { nerExtractor } from '@/lib/ai/ner-extractor';
+import { OCRService } from '@/lib/ocr-service';
+import { AuditLogger } from '@/lib/audit-logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -82,6 +84,15 @@ export async function POST(request: NextRequest) {
 
     if (dbError) throw dbError;
 
+    await AuditLogger.log({
+      userId: session.user.id,
+      action: 'file_upload',
+      resourceType: 'file',
+      resourceId: fileRecord.id,
+      ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+      metadata: { filename: file.name, fileType: file.type, fileSize: file.size }
+    });
+
     return NextResponse.json({ 
       file: fileRecord,
       extractedText,
@@ -99,11 +110,14 @@ async function extractTextFromFile(buffer: Buffer, fileType: string): Promise<st
     if (fileType === 'application/pdf') {
       return 'PDF document uploaded. Content will be analyzed by AI.';
     } else if (fileType.startsWith('image/')) {
-      return 'Image uploaded. Text will be extracted via OCR.';
+      const ocrResult = await OCRService.extractTextFromImageWithConfidence(buffer);
+      if (ocrResult.confidence > 60) {
+        return ocrResult.text;
+      }
+      return 'Image uploaded. Low OCR confidence - manual review recommended.';
     } else if (fileType.includes('wordprocessingml') || fileType === 'application/msword') {
       return 'Word document uploaded. Content will be analyzed by AI.';
     } else if (fileType === 'text/plain') {
-      // For text files, we can actually read the content
       return buffer.toString('utf-8');
     } else if (fileType.includes('spreadsheetml') || fileType === 'application/vnd.ms-excel') {
       return 'Excel spreadsheet uploaded. Data will be analyzed by AI.';

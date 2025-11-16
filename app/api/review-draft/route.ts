@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { grammarChecker } from '@/lib/ai/grammar-checker';
+import { AuditLogger } from '@/lib/audit-logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,6 +24,14 @@ export async function POST(request: NextRequest) {
 
     const totalIssues = grammarErrors.length + legalErrors.length;
     const score = Math.max(0, 100 - (totalIssues * 2));
+
+    await AuditLogger.log({
+      userId: session.user.id,
+      action: 'review_draft',
+      resourceType: 'review',
+      ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+      metadata: { textLength: text.length, score, totalIssues }
+    });
 
     return NextResponse.json({
       success: true,

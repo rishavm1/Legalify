@@ -2,12 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { citationSystem } from '@/lib/ai/citation-system';
+import { AuditLogger } from '@/lib/audit-logger';
+import { RBAC } from '@/lib/rbac';
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const userRole = (session.user as any).role || 'free';
+    if (!RBAC.canAccessFeature(userRole, 'memo-generator')) {
+      return NextResponse.json({ 
+        error: RBAC.getUpgradeMessage('Legal Memo Generator') 
+      }, { status: 403 });
     }
 
     const { topic, facts, legalIssues } = await request.json();
@@ -18,6 +27,14 @@ export async function POST(request: NextRequest) {
 
     const research = await citationSystem.conductResearch(topic);
     const memo = generateLegalMemo(topic, facts || '', legalIssues || '', research);
+
+    await AuditLogger.log({
+      userId: session.user.id,
+      action: 'generate_memo',
+      resourceType: 'memo',
+      ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+      metadata: { topic }
+    });
 
     return NextResponse.json({
       success: true,

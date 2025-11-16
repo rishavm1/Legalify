@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/db';
 import type { AIMessage } from '@/lib/ai/types';
 import { citationSystem } from '@/lib/ai/citation-system';
 import { grammarChecker } from '@/lib/ai/grammar-checker';
+import { AuditLogger } from '@/lib/audit-logger';
 
 // Dynamic import for server-side only
 let aiLoadBalancer: any = null;
@@ -80,6 +81,15 @@ export async function POST(request: NextRequest) {
       .from('chat_sessions')
       .update({ updated_at: new Date().toISOString() })
       .eq('id', sessionId);
+
+    await AuditLogger.log({
+      userId: session.user.id,
+      action: 'chat_message',
+      resourceType: 'chat',
+      resourceId: sessionId,
+      ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+      metadata: { messageLength: message.length, hasFileContext: !!fileContext }
+    });
 
     return NextResponse.json({ response: aiResponse });
   } catch (error) {
