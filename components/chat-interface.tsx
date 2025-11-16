@@ -8,6 +8,8 @@ import { AgreementWorkflow } from '@/components/agreement-workflow';
 import { Upload, Plus, MessageSquare, FileText, Download, Trash2, Copy, RotateCcw, ArrowLeft, Scale, Check, BookOpen, Menu, X, LogOut, User } from 'lucide-react';
 import CinematicThemeSwitcher from '@/components/ui/cinematic-theme-switcher';
 import TetrisLoading from '@/components/ui/tetris-loader';
+import { FeatureButtons } from '@/components/feature-buttons';
+import { UsageDashboard } from '@/components/usage-dashboard';
 
 interface ChatSession {
   id: string;
@@ -38,6 +40,7 @@ export function ChatInterface() {
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const [showDownloadButtons, setShowDownloadButtons] = useState<Set<string>>(new Set());
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -749,18 +752,21 @@ export function ChatInterface() {
 
             {/* Input Area */}
             <div className="border-t border-white/10 p-4 md:p-6 bg-gradient-to-r from-black/50 to-neutral-900/50 backdrop-blur-xl">
-              <div className="flex items-center space-x-3 mb-4">
-                <Button
-                  onClick={() => setShowAgreementWorkflow(true)}
-                  variant="outline"
-                  size="sm"
-                  className="premium-button bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 border-white dark:border-neutral-700 text-black dark:text-white text-sm font-semibold rounded-xl shadow-lg"
-                >
-                  <FileText className="w-4 h-4 mr-2" />
-                  Draft Agreement
-                </Button>
-                <span className="text-black dark:text-neutral-400 text-sm font-medium">Quick actions</span>
-              </div>
+              <FeatureButtons onFeatureClick={(feature) => {
+                if (feature === 'dashboard') {
+                  setShowDashboard(true);
+                } else if (feature === 'research') {
+                  setInputMessage('I need legal research on ');
+                } else if (feature === 'memo') {
+                  setInputMessage('Generate a legal memo on ');
+                } else if (feature === 'argument') {
+                  setInputMessage('Generate legal arguments for ');
+                } else if (feature === 'review') {
+                  setInputMessage('Review this document: ');
+                } else if (feature === 'analyze') {
+                  fileInputRef.current?.click();
+                }
+              }} />
               
               <PromptInputBox
                 onSend={handleSendMessage}
@@ -773,7 +779,7 @@ export function ChatInterface() {
         ) : null
         }
         
-        {!currentSession && !showAgreementWorkflow && (
+        {!currentSession && !showAgreementWorkflow && !showDashboard && (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center text-black dark:text-neutral-400 fade-in">
               <div className="w-20 h-20 bg-gradient-to-br from-neutral-800 to-neutral-700 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl">
@@ -782,6 +788,24 @@ export function ChatInterface() {
               <p className="text-xl font-medium mb-2">Select a chat or create a new one to get started</p>
               <p className="text-base text-black dark:text-neutral-500">Your legal assistant is ready to help</p>
             </div>
+          </div>
+        )}
+
+        {showDashboard && (
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-black dark:text-white">Usage Dashboard</h2>
+              <Button
+                onClick={() => setShowDashboard(false)}
+                variant="ghost"
+                size="sm"
+                className="text-black dark:text-white"
+              >
+                <X className="w-4 h-4 mr-2" />
+                Close
+              </Button>
+            </div>
+            <UsageDashboard />
           </div>
         )}
       </div>
