@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/db';
+import { nerExtractor } from '@/lib/ai/ner-extractor';
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,8 +57,12 @@ export async function POST(request: NextRequest) {
       .from('legal-documents')
       .getPublicUrl(fileName);
 
-    // Extract text from file (placeholder - implement OCR/PDF parsing)
+    // Extract text from file
     const extractedText = await extractTextFromFile(buffer, file.type);
+
+    // Perform NER extraction and analysis
+    const facts = nerExtractor.extractFacts(extractedText);
+    const summary = nerExtractor.generateSummary(facts);
 
     // Save file record
     const { data: fileRecord, error: dbError } = await supabaseAdmin
@@ -70,7 +75,7 @@ export async function POST(request: NextRequest) {
         file_size: file.size,
         file_url: publicUrl,
         extracted_text: extractedText,
-        analysis_summary: await analyzeDocument(extractedText)
+        analysis_summary: summary || await analyzeDocument(extractedText)
       })
       .select()
       .single();
@@ -80,6 +85,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       file: fileRecord,
       extractedText,
+      facts,
+      summary,
       message: 'File uploaded and analyzed successfully'
     });
   } catch (error) {

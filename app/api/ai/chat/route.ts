@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/db';
 import type { AIMessage } from '@/lib/ai/types';
+import { citationSystem } from '@/lib/ai/citation-system';
+import { grammarChecker } from '@/lib/ai/grammar-checker';
 
 // Dynamic import for server-side only
 let aiLoadBalancer: any = null;
@@ -195,6 +197,16 @@ Please provide these details, and I'll draft a comprehensive document for you ba
     return handleCourtQuery(message, conversationContext);
   }
 
+  // Handle research requests
+  if (messageLower.includes('research') || messageLower.includes('case law') || messageLower.includes('statute')) {
+    return handleResearchRequest(message, conversationContext);
+  }
+
+  // Handle review requests
+  if (messageLower.includes('review') || messageLower.includes('check') || messageLower.includes('grammar')) {
+    return handleReviewRequest(message, conversationContext);
+  }
+
   // Handle legal advice requests
   if (messageLower.includes('advice') || messageLower.includes('help') || messageLower.includes('what should')) {
     return handleLegalAdvice(message, conversationContext);
@@ -333,6 +345,43 @@ Please describe your specific situation, and I'll provide guidance based on Indi
 I'll analyze your situation and provide advice based on Indian law.`;
 }
 
+async function handleResearchRequest(message: string, context: string): Promise<string> {
+  try {
+    const research = await citationSystem.conductResearch(message);
+    return `📚 **Legal Research Results**
+
+${research.summary}
+
+${research.bibliography}
+
+**Confidence Level**: ${(research.confidence * 100).toFixed(0)}%
+
+Would you like me to:
+- Generate a detailed legal memo on this topic
+- Draft a document incorporating these legal provisions
+- Provide more specific guidance on any particular aspect`;
+  } catch (error) {
+    return 'I can help you research Indian law. Please specify what legal topic, statute, or case law you need information about.';
+  }
+}
+
+function handleReviewRequest(message: string, context: string): string {
+  return `📝 **Document Review Service**
+
+I can review your legal document for:
+
+✅ **Grammar & Spelling** - Professional language check
+✅ **Legal Errors** - Missing clauses, ambiguous terms
+✅ **Compliance** - Indian law requirements
+✅ **Structure** - Proper legal formatting
+
+To review your document:
+1. Upload it using the paperclip icon (📎)
+2. Or paste the text directly in the chat
+
+I'll provide a detailed analysis with suggestions for improvement.`;
+}
+
 function handleFollowUp(message: string, context: string): string {
   // Analyze context to provide relevant follow-up
   if (context.includes('agreement') || context.includes('draft')) {
@@ -349,14 +398,21 @@ If you want to:
 - **Draft a document** - Tell me the type and details
 - **Analyze a document** - Upload it using the paperclip icon
 - **Get legal advice** - Describe your situation
-- **Understand a process** - Ask your specific question`;
+- **Research law** - Ask about statutes or case law
+- **Review a draft** - Upload or paste your document`;
 }
 
 async function analyzeUploadedDocument(message: string, fileContext: any): Promise<string> {
-  // Try to use AI for document analysis
   try {
-    const { aiLoadBalancer } = await import('@/lib/ai/load-balancer');
+    const { nerExtractor } = await import('@/lib/ai/ner-extractor');
+    const extractedText = fileContext.extracted_text || '';
     
+    // Extract facts and entities
+    const facts = nerExtractor.extractFacts(extractedText);
+    const summary = nerExtractor.generateSummary(facts);
+    
+    // Try AI analysis
+    const { aiLoadBalancer } = await import('@/lib/ai/load-balancer');
     const systemPrompt = `You are a legal document analyzer. Analyze the uploaded document and provide:
 1. Document type and purpose
 2. Key legal points
@@ -364,7 +420,8 @@ async function analyzeUploadedDocument(message: string, fileContext: any): Promi
 4. Recommendations
 
 Document: ${fileContext.filename}
-Extracted text: ${fileContext.extracted_text || 'Processing...'}`;
+Extracted Facts:
+${summary}`;
 
     const messages: AIMessage[] = [
       { role: 'system', content: systemPrompt },
@@ -372,7 +429,18 @@ Extracted text: ${fileContext.extracted_text || 'Processing...'}`;
     ];
 
     const response = await aiLoadBalancer.generateResponse(messages);
-    return response.content;
+    return `📄 **Document Analysis: ${fileContext.filename}**
+
+${summary}
+
+**AI Analysis**:
+${response.content}
+
+**Actions Available**:
+✅ Review for grammar and legal errors
+✅ Generate related legal documents
+✅ Research relevant case law
+✅ Draft a response or notice`;
   } catch (error) {
     console.error('AI document analysis failed, using fallback:', error);
     return analyzeUploadedDocumentFallback(message, fileContext);
