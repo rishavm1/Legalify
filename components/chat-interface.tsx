@@ -752,19 +752,33 @@ export function ChatInterface() {
 
             {/* Input Area */}
             <div className="border-t border-white/10 p-4 md:p-6 bg-gradient-to-r from-black/50 to-neutral-900/50 backdrop-blur-xl">
-              <FeatureButtons onFeatureClick={(feature) => {
+              <FeatureButtons onFeatureClick={async (feature) => {
                 if (feature === 'dashboard') {
                   setShowDashboard(true);
-                } else if (feature === 'research') {
-                  setInputMessage('I need legal research on ');
-                } else if (feature === 'memo') {
-                  setInputMessage('Generate a legal memo on ');
-                } else if (feature === 'argument') {
-                  setInputMessage('Generate legal arguments for ');
-                } else if (feature === 'review') {
-                  setInputMessage('Review this document: ');
                 } else if (feature === 'analyze') {
                   fileInputRef.current?.click();
+                } else {
+                  // Create session if needed
+                  if (!currentSession) {
+                    await createNewSession();
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                  }
+                  
+                  // Set appropriate message based on feature
+                  let message = '';
+                  if (feature === 'research') {
+                    message = 'I need legal research on property rights in India';
+                  } else if (feature === 'memo') {
+                    message = 'Generate a legal memo on breach of contract';
+                  } else if (feature === 'argument') {
+                    message = 'Generate legal arguments for a property dispute case';
+                  } else if (feature === 'review') {
+                    message = 'I want to review a legal document for errors';
+                  }
+                  
+                  if (message) {
+                    await handleSendMessage(message);
+                  }
                 }
               }} />
               
