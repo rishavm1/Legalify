@@ -1,99 +1,96 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Mic, MicOff } from 'lucide-react';
 
 interface VoiceInputButtonProps {
-  onInputReceived: (text: string) => void;
+  onTranscript?: (text: string) => void;
+  onInputReceived?: (text: string) => void;
 }
 
-export function VoiceInputButton({ onInputReceived }: VoiceInputButtonProps) {
-  const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
+export function VoiceInputButton({ onTranscript, onInputReceived }: VoiceInputButtonProps) {
+  const [isListening, setIsListening] = useState(false);
+  const [isSupported, setIsSupported] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      chunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data);
-      };
-
-      mediaRecorder.onstop = async () => {
-        console.log('Recording stopped, processing...');
-        const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
-        console.log('Audio blob size:', audioBlob.size, 'bytes');
-        await sendAudio(audioBlob);
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-      console.log('Recording started...');
-    } catch (error) {
-      console.error('Microphone error:', error);
-      alert('Microphone access denied');
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
-  };
-
-  const sendAudio = async (audioBlob: Blob) => {
-    setIsProcessing(true);
-    try {
-      const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.webm');
-      formData.append('language', localStorage.getItem('language') || 'en-IN');
-
-      console.log('Sending audio to API...');
-      const response = await fetch('/api/voice', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await response.json();
-      console.log('Voice API response:', data);
+  useEffect(() => {
+    // Check if Web Speech API is supported
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      setIsSupported(true);
       
-      if (data.success && data.transcript) {
-        console.log('Transcript received:', data.transcript);
-        onInputReceived(data.transcript);
-      } else if (data.error) {
-        console.error('Voice API error:', data.error);
-        alert('Voice recognition failed: ' + data.error);
-      } else {
-        console.warn('No transcript received');
-        alert('Could not transcribe audio. Please try again.');
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-IN';
+      
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        console.log('✅ Speech recognized:', transcript);
+        
+        if (onTranscript) onTranscript(transcript);
+        if (onInputReceived) onInputReceived(transcript);
+        
+        setIsListening(false);
+      };
+      
+      recognition.onerror = (event: any) => {
+        console.error('❌ Speech recognition error:', event.error);
+        setIsListening(false);
+        
+        if (event.error === 'no-speech') {
+          alert('No speech detected. Please try again.');
+        } else if (event.error === 'not-allowed') {
+          alert('Microphone access denied. Please allow microphone access.');
+        } else {
+          alert('Speech recognition failed. Please try again.');
+        }
+      };
+      
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+      
+      recognitionRef.current = recognition;
+    }
+  }, [onTranscript, onInputReceived]);
+
+  const toggleListening = () => {
+    if (!isSupported) {
+      alert('Speech recognition not supported in this browser. Please use Chrome or Edge.');
+      return;
+    }
+    
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current?.start();
+        setIsListening(true);
+        console.log('🎤 Listening...');
+      } catch (error) {
+        console.error('Failed to start recognition:', error);
+        alert('Failed to start voice recognition. Please try again.');
       }
-    } catch (error) {
-      console.error('Voice API error:', error);
-      alert('Failed to process voice input');
-    } finally {
-      setIsProcessing(false);
     }
   };
+
+  if (!isSupported) {
+    return null; // Hide button if not supported
+  }
 
   return (
     <button
-      onClick={isRecording ? stopRecording : startRecording}
-      disabled={isProcessing}
+      onClick={toggleListening}
       className={`p-2 rounded-full transition-all ${
-        isRecording 
-          ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
-          : 'bg-blue-500 hover:bg-blue-600'
-      } ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
-      title={isRecording ? 'Stop recording' : 'Start voice input'}
+        isListening 
+          ? 'bg-red-500 hover:bg-red-600 animate-pulse shadow-lg shadow-red-500/50' 
+          : 'bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-500/30'
+      }`}
+      title={isListening ? 'Stop listening' : 'Start voice input (like Win+H)'}
     >
-      {isRecording ? (
+      {isListening ? (
         <MicOff className="h-5 w-5 text-white" />
       ) : (
         <Mic className="h-5 w-5 text-white" />

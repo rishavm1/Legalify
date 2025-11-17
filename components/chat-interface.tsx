@@ -469,6 +469,9 @@ export function ChatInterface() {
           
           <div className="flex items-center gap-2">
             <LanguageSelectorButton />
+            <VoiceInputButton onInputReceived={(text) => {
+              setInputMessage(text);
+            }} />
           </div>
         </div>
         
