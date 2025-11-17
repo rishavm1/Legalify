@@ -14,19 +14,13 @@ https://vercel.com/rishavm1s-projects/legalifylunatics/settings/environment-vari
 ### 2. Update NEXT_PUBLIC_SUPABASE_ANON_KEY:
 - Find: `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - Click "Edit"
-- Replace with:
-```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5eXFrdmRuYXJ3YnZ4Z3Vxd3ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzNjkxOTgsImV4cCI6MjA3ODcyOTE5OH0.b3_LOPPI_5X6PI0TnA77S74R8e1faO6GjZIXa_l9LaU
-```
+- Paste the NEW anon key from Supabase dashboard
 - Click "Save"
 
 ### 3. Update SUPABASE_SERVICE_ROLE_KEY:
 - Find: `SUPABASE_SERVICE_ROLE_KEY`
 - Click "Edit"
-- Replace with:
-```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5eXFrdmRuYXJ3YnZ4Z3Vxd3ZnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzM2OTE5OCwiZXhwIjoyMDc4NzI5MTk4fQ.9MN3BHX1I4MPPtFhvxbZ28xYtUbC1sHMwwJZaZZmC-8
-```
+- Paste the NEW service_role key from Supabase dashboard
 - Click "Save"
 
 ### 4. Redeploy:

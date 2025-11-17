@@ -34,14 +34,12 @@
 **Update these 2 variables**:
 
 1. `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   ```
-   eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5eXFrdmRuYXJ3YnZ4Z3Vxd3ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzNjkxOTgsImV4cCI6MjA3ODcyOTE5OH0.b3_LOPPI_5X6PI0TnA77S74R8e1faO6GjZIXa_l9LaU
-   ```
+   - Get from: https://supabase.com/dashboard/project/lyyqkvdnarwbvxguqwvg/settings/api
+   - Copy the "anon public" key
 
 2. `SUPABASE_SERVICE_ROLE_KEY`
-   ```
-   eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5eXFrdmRuYXJ3YnZ4Z3Vxd3ZnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzM2OTE5OCwiZXhwIjoyMDc4NzI5MTk4fQ.9MN3BHX1I4MPPtFhvxbZ28xYtUbC1sHMwwJZaZZmC-8
-   ```
+   - Get from: https://supabase.com/dashboard/project/lyyqkvdnarwbvxguqwvg/settings/api
+   - Copy the "service_role secret" key
 
 **Then**: Click "Redeploy" or push any commit to auto-deploy
 
