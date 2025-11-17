@@ -46,3 +46,19 @@ export class AuditLogger {
     return data || [];
   }
 }
+
+// Helper function for easy logging
+export async function logAudit(
+  userId: string,
+  action: string,
+  req: any,
+  metadata?: Record<string, any>
+): Promise<void> {
+  await AuditLogger.log({
+    userId,
+    action,
+    ipAddress: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown',
+    userAgent: req.headers.get('user-agent') || 'unknown',
+    metadata
+  });
+}

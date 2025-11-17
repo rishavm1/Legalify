@@ -76,7 +76,7 @@ export function VoiceInput({ onTranscript, language = 'en-IN' }: VoiceInputProps
     <Button
       onClick={isRecording ? stopRecording : startRecording}
       disabled={isProcessing}
-      variant={isRecording ? 'destructive' : 'outline'}
+      variant={isRecording ? 'default' : 'outline'}
       size="icon"
       title={isRecording ? 'Stop recording' : 'Start voice input'}
     >
