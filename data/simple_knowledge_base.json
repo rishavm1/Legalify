@@ -1,0 +1,104 @@
+{
+  "metadata": {
+    "total_documents": 10,
+    "created": "2024-11-17",
+    "description": "Legalify Legal Knowledge Base"
+  },
+  "documents": {
+    "Arbitration and Conciliation Act 1996 - Section 7": {
+      "content": "Section 7 in The Arbitration And Conciliation Act, 1996 Arbitration agreement.—(1) In this Part, \"arbitration agreement\" means an agreement by the parties to submit to arbitration all or certain disputes which have arisen or which may arise between them in respect of a defined legal relationship, whether contractual or not. (2) An arbitration agreement may be in the form of an arbitration clause in a contract or in the form of a separate agreement.",
+      "source_file": "Arbitration_and_Conciliation_Act_1996_-_Section_7_processed.txt",
+      "keywords": [
+        "section",
+        "act",
+        "fine",
+        "legal",
+        "contract",
+        "agreement"
+      ]
+    },
+    "Code of Civil Procedure 1908 - Order 7 Rule 1": {
+      "content": "Order VII Rule 1 in The Code Of Civil Procedure, 1908 Plaint to contain facts, not evidence.—(1) Every plaint shall contain the following particulars:— (a) the name of the Court in which the suit is brought; (b) the name, description and place of residence of the plaintiff; (c) the name, description and place of residence of the defendant, so far as they can be ascertained; (d) where the plaintiff or the defendant is a minor or a person of unsound mind, a statement to that effect; (e) the facts constituting the cause of action and when it arose; (f) the facts showing that the Court has jurisdiction; (g) the relief which the plaintiff claims; (h) where the plaintiff has allowed a set-off or relinquished a portion of his claim, the amount so allowed or relinquished; and (i) a statement of the value of the subject-matter of the suit for the purposes of jurisdiction and of court-fees, so far as the case admits.",
+      "source_file": "Code_of_Civil_Procedure_1908_-_Order_7_Rule_1_processed.txt",
+      "keywords": [
+        "act",
+        "court",
+        "evidence"
+      ]
+    },
+    "Code of Criminal Procedure 1973 - Section 154": {
+      "content": "Section 154 in The Code Of Criminal Procedure, 1973 Information in cognizable cases.—(1) Every information relating to the commission of a cognizable offence, if given orally to an officer in charge of a police station, shall be reduced to writing by him or under his direction, and be read over to the informant; and every such information, whether given in writing or reduced to writing as aforesaid, shall be signed by the person giving it, and the substance thereof shall be entered in a book to be kept by such officer in such form as the State Government may prescribe in this behalf.",
+      "source_file": "Code_of_Criminal_Procedure_1973_-_Section_154_processed.txt",
+      "keywords": [
+        "section"
+      ]
+    },
+    "Constitution of India - Article 21": {
+      "content": "Article 21 in The Constitution Of India 1949 Protection of life and personal liberty.—No person shall be deprived of his life or personal liberty except according to procedure established by law.",
+      "source_file": "Constitution_of_India_-_Article_21_processed.txt",
+      "keywords": [
+        "law",
+        "constitution",
+        "article"
+      ]
+    },
+    "Consumer Protection Act 2019 - Section 2": {
+      "content": "Section 2 in The Consumer Protection Act, 2019 Definitions.—(1) In this Act, unless the context otherwise requires,— (7) \"consumer\" means any person who— (i) buys any goods for a consideration which has been paid or promised or partly paid and partly promised, or under any system of deferred payment and includes any user of such goods other than the person who buys such goods for consideration paid or promised or partly paid or partly promised, or under any system of deferred payment, when such use is made with the approval of such person, but does not include a person who obtains such goods for resale or for any commercial purpose;",
+      "source_file": "Consumer_Protection_Act_2019_-_Section_2_processed.txt",
+      "keywords": [
+        "section",
+        "act"
+      ]
+    },
+    "Indian Contract Act 1872 - Section 10": {
+      "content": "Section 10 in The Indian Contract Act, 1872 What agreements are contracts.—All agreements are contracts if they are made by the free consent of parties competent to contract, for a lawful consideration and with a lawful object, and are not hereby expressly declared to be void.",
+      "source_file": "Indian_Contract_Act_1872_-_Section_10_processed.txt",
+      "keywords": [
+        "section",
+        "act",
+        "law",
+        "contract",
+        "agreement"
+      ]
+    },
+    "Indian Evidence Act 1872 - Section 3": {
+      "content": "Section 3 in The Indian Evidence Act, 1872 Interpretation clause.—In this Act the following words and expressions are used in the following senses, unless a contrary intention appears from the context:— \"Court\".—\"Court\" includes all Judges and Magistrates and all persons, except arbitrators, legally authorised to take evidence. \"Fact\".—\"Fact\" means and includes— (1) any thing, state of things, or relation of things, capable of being perceived by the senses; (2) any mental condition of which any person is conscious.",
+      "source_file": "Indian_Evidence_Act_1872_-_Section_3_processed.txt",
+      "keywords": [
+        "section",
+        "act",
+        "court",
+        "judge",
+        "legal",
+        "evidence"
+      ]
+    },
+    "Indian Penal Code 1860 - Section 420": {
+      "content": "Section 420 in The Indian Penal Code Cheating and dishonestly inducing delivery of property.—Whoever cheats and thereby dishonestly induces the person deceived to deliver any property to any person, or to make, alter or destroy the whole or any part of a valuable security, or anything which is signed or sealed, and which is capable of being converted into a valuable security, shall be punished with imprisonment of either description for a term which may extend to seven years, and shall also be liable to fine.",
+      "source_file": "Indian_Penal_Code_1860_-_Section_420_processed.txt",
+      "keywords": [
+        "section",
+        "imprisonment",
+        "fine"
+      ]
+    },
+    "Information Technology Act 2000 - Section 43": {
+      "content": "Section 43 in The Information Technology Act, 2000 Penalty and Compensation for damage to computer, computer system, etc.—If any person without permission of the owner or any other person who is in charge of a computer, computer system or computer network,— (a) accesses or secures access to such computer, computer system or computer network or computer resource; (b) downloads, copies or extracts any data, computer data base or information from such computer, computer system or computer network including information or data held or stored in any removable storage medium; commits the offence of hacking and shall be liable to pay damages by way of compensation to the person so affected.",
+      "source_file": "Information_Technology_Act_2000_-_Section_43_processed.txt",
+      "keywords": [
+        "section",
+        "act"
+      ]
+    },
+    "Transfer of Property Act 1882 - Section 5": {
+      "content": "Section 5 in The Transfer Of Property Act, 1882 Transfer of property defined.—In the following sections \"transfer of property\" means an act by which a living person conveys property, in present or in future, to one or more other living persons, or to himself, or to himself and one or more other living persons; and \"to transfer property\" is to perform such act. In this section \"living person\" includes a company or association or body of individuals, whether incorporated or not, but nothing herein contained shall affect any law for the time being in force relating to transfer of property to or by companies, associations or bodies of individuals.",
+      "source_file": "Transfer_of_Property_Act_1882_-_Section_5_processed.txt",
+      "keywords": [
+        "section",
+        "act",
+        "fine",
+        "law"
+      ]
+    }
+  }
+}
