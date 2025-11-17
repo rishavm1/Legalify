@@ -5,10 +5,12 @@ Upload RAG database to Supabase
 import json
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
-# Supabase credentials from .env.local
-SUPABASE_URL = "https://lyyqkvdnarwbvxguqwvg.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5eXFrdmRuYXJ3YnZ4Z3Vxd3ZnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTk4NTcyNSwiZXhwIjoyMDc3NTYxNzI1fQ.HkmMB1v3e-jdLDeExOSL8baWzJS-zqGzmzyIHeU3veE"
+load_dotenv('.env.local')
+
+SUPABASE_URL = os.getenv('NEXT_PUBLIC_SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
 
 def upload_rag_data():
     """Upload RAG database to Supabase"""
