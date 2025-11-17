@@ -340,6 +340,9 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
   const [filePreviews, setFilePreviews] = React.useState<{ [key: string]: string }>({});
   const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
   const [isRecording, setIsRecording] = React.useState(false);
+  const [isProcessingVoice, setIsProcessingVoice] = React.useState(false);
+  const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
+  const chunksRef = React.useRef<Blob[]>([]);
   const uploadInputRef = React.useRef<HTMLInputElement>(null);
   const promptBoxRef = React.useRef<HTMLDivElement>(null);
 
@@ -504,10 +507,63 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                   ? "bg-black dark:bg-white hover:bg-neutral-800 dark:hover:bg-white/80 text-white dark:text-[#1F2023]"
                   : "bg-transparent hover:bg-neutral-200 dark:hover:bg-gray-600/30 text-neutral-600 dark:text-[#9CA3AF] hover:text-neutral-800 dark:hover:text-[#D1D5DB]"
               )}
-              onClick={() => {
-                if (isRecording) setIsRecording(false);
-                else if (hasContent) handleSubmit();
-                else setIsRecording(true);
+              onClick={async () => {
+                if (isRecording) {
+                  // Stop recording
+                  if (mediaRecorderRef.current) {
+                    mediaRecorderRef.current.stop();
+                  }
+                  setIsRecording(false);
+                } else if (hasContent) {
+                  handleSubmit();
+                } else {
+                  // Start recording
+                  try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    const mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorderRef.current = mediaRecorder;
+                    chunksRef.current = [];
+
+                    mediaRecorder.ondataavailable = (e) => {
+                      if (e.data.size > 0) chunksRef.current.push(e.data);
+                    };
+
+                    mediaRecorder.onstop = async () => {
+                      setIsProcessingVoice(true);
+                      const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
+                      
+                      try {
+                        const formData = new FormData();
+                        formData.append('audio', audioBlob, 'recording.webm');
+                        formData.append('language', localStorage.getItem('voiceLanguage') || 'en-IN');
+
+                        const response = await fetch('/api/voice', {
+                          method: 'POST',
+                          body: formData,
+                        });
+
+                        const data = await response.json();
+                        if (data.success && data.transcript) {
+                          setInput(data.transcript);
+                        } else {
+                          alert('Could not transcribe audio. Please try again.');
+                        }
+                      } catch (error) {
+                        console.error('Voice API error:', error);
+                        alert('Failed to process voice input');
+                      } finally {
+                        setIsProcessingVoice(false);
+                        stream.getTracks().forEach(track => track.stop());
+                      }
+                    };
+
+                    mediaRecorder.start();
+                    setIsRecording(true);
+                  } catch (error) {
+                    console.error('Microphone error:', error);
+                    alert('Microphone access denied');
+                  }
+                }
               }}
               disabled={isLoading && !hasContent}
             >

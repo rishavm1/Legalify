@@ -20,16 +20,32 @@ export function LanguageSelectorButton() {
   }, []);
 
   const handleChange = async (newLang: string) => {
+    console.log('Changing language to:', newLang);
     setLanguage(newLang);
     setShowMenu(false);
     localStorage.setItem('language', newLang);
+    
+    // Map to voice recognition language codes
+    const langMap: Record<string, string> = {
+      'en': 'en-IN',
+      'hi': 'hi-IN',
+      'ta': 'ta-IN',
+      'pa': 'pa-IN',
+    };
+    localStorage.setItem('voiceLanguage', langMap[newLang] || 'en-IN');
 
     try {
-      await fetch('/api/translate', {
+      const response = await fetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ language: newLang }),
       });
+      const data = await response.json();
+      console.log('Language update response:', data);
+      
+      // Show confirmation
+      const langName = LANGUAGES[newLang as keyof typeof LANGUAGES].name;
+      alert(`Language changed to ${langName}`);
     } catch (error) {
       console.error('Language update error:', error);
     }
@@ -38,9 +54,12 @@ export function LanguageSelectorButton() {
   return (
     <div className="relative">
       <button
-        onClick={() => setShowMenu(!showMenu)}
+        onClick={() => {
+          console.log('Language menu toggled');
+          setShowMenu(!showMenu);
+        }}
         className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-        title="Change language"
+        title={`Change language (Current: ${LANGUAGES[language as keyof typeof LANGUAGES]?.name || 'English'})`}
       >
         <Languages className="h-5 w-5" />
       </button>

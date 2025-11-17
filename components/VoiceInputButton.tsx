@@ -25,13 +25,16 @@ export function VoiceInputButton({ onInputReceived }: VoiceInputButtonProps) {
       };
 
       mediaRecorder.onstop = async () => {
+        console.log('Recording stopped, processing...');
         const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        console.log('Audio blob size:', audioBlob.size, 'bytes');
         await sendAudio(audioBlob);
         stream.getTracks().forEach(track => track.stop());
       };
 
       mediaRecorder.start();
       setIsRecording(true);
+      console.log('Recording started...');
     } catch (error) {
       console.error('Microphone error:', error);
       alert('Microphone access denied');
@@ -49,20 +52,31 @@ export function VoiceInputButton({ onInputReceived }: VoiceInputButtonProps) {
     setIsProcessing(true);
     try {
       const formData = new FormData();
-      formData.append('audio', audioBlob);
+      formData.append('audio', audioBlob, 'recording.webm');
       formData.append('language', localStorage.getItem('language') || 'en-IN');
 
+      console.log('Sending audio to API...');
       const response = await fetch('/api/voice', {
         method: 'POST',
         body: formData,
       });
 
       const data = await response.json();
+      console.log('Voice API response:', data);
+      
       if (data.success && data.transcript) {
+        console.log('Transcript received:', data.transcript);
         onInputReceived(data.transcript);
+      } else if (data.error) {
+        console.error('Voice API error:', data.error);
+        alert('Voice recognition failed: ' + data.error);
+      } else {
+        console.warn('No transcript received');
+        alert('Could not transcribe audio. Please try again.');
       }
     } catch (error) {
       console.error('Voice API error:', error);
+      alert('Failed to process voice input');
     } finally {
       setIsProcessing(false);
     }
