@@ -122,7 +122,7 @@ class IndianLawScraper:
             # Rate limiting
             time.sleep(2)
         
-        print(f"\n✅ Scraping complete! Files saved in: {self.output_dir}")
+        print(f"\n[SUCCESS] Scraping complete! Files saved in: {self.output_dir}")
 
 # Priority acts to scrape first
 PRIORITY_ACTS = [

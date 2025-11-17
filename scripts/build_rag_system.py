@@ -106,20 +106,20 @@ class LegalRAGSystem:
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2)
         
-        print(f"✅ Saved {len(data)} entries to {output_file}")
+        print(f"[SUCCESS] Saved {len(data)} entries to {output_file}")
         print("Upload this to Supabase document_embeddings table")
         
         return output_file
     
     def build_complete_rag(self):
         """Main function to build complete RAG system"""
-        print("\n🚀 Building RAG System...\n")
+        print("\n[INFO] Building RAG System...\n")
         
         # Step 1: Load documents
         self.load_documents()
         
         if not self.documents:
-            print("❌ No documents found! Run scrape_indian_laws.py first")
+            print("[ERROR] No documents found! Run scrape_indian_laws.py first")
             return
         
         # Step 2: Chunk documents
@@ -131,11 +131,11 @@ class LegalRAGSystem:
         # Step 4: Save to database format
         output_file = self.save_to_database(chunks, embeddings)
         
-        print(f"\n✅ RAG System built successfully!")
-        print(f"📁 Output: {output_file}")
-        print(f"📊 Total chunks: {len(chunks)}")
-        print(f"🔢 Embedding dimensions: 768")
-        print("\n📝 Next steps:")
+        print(f"\n[SUCCESS] RAG System built successfully!")
+        print(f"[OUTPUT] File: {output_file}")
+        print(f"[INFO] Total chunks: {len(chunks)}")
+        print(f"[INFO] Embedding dimensions: 768")
+        print("\n[NEXT] Next steps:")
         print("1. Upload rag_database.json to Supabase")
         print("2. Use semantic search API to query")
         print("3. Integrate with chat for smart legal search")
