@@ -574,7 +574,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
               ) : hasContent ? (
                 <ArrowUp className="h-4 w-4 text-white dark:text-[#1F2023]" />
               ) : (
-                <Mic className="h-5 w-5 text-neutral-600 dark:text-[#1F2023] transition-colors" />
+                <Mic className="h-5 w-5 transition-colors" />
               )}
             </Button>
           </PromptInputAction>

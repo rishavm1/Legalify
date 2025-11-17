@@ -35,17 +35,12 @@ export function LanguageSelectorButton() {
     localStorage.setItem('voiceLanguage', langMap[newLang] || 'en-IN');
 
     try {
-      const response = await fetch('/api/translate', {
+      await fetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ language: newLang }),
       });
-      const data = await response.json();
-      console.log('Language update response:', data);
-      
-      // Show confirmation
-      const langName = LANGUAGES[newLang as keyof typeof LANGUAGES].name;
-      alert(`Language changed to ${langName}`);
+      console.log('Language changed to:', newLang);
     } catch (error) {
       console.error('Language update error:', error);
     }
@@ -59,7 +54,7 @@ export function LanguageSelectorButton() {
           setShowMenu(!showMenu);
         }}
         className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-        title={`Change language (Current: ${LANGUAGES[language as keyof typeof LANGUAGES]?.name || 'English'})`}
+        title="Change language"
       >
         <Languages className="h-5 w-5" />
       </button>
