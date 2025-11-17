@@ -11,6 +11,8 @@ import time
 # Check for required dependencies
 try:
     import requests
+    from requests.adapters import HTTPAdapter
+    from urllib3.util.retry import Retry
     from bs4 import BeautifulSoup
 except ImportError as e:
     print("\n" + "="*60)
@@ -31,6 +33,20 @@ OUTPUT_DIR = "data/acts"
 BASE_URL = "https://www.indiacode.nic.in"
 MAX_PAGES = 50  # Safety limit (50 pages * 20 acts = ~1000 acts)
 
+# Browser headers to avoid blocking
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+}
+
+def create_session():
+    """Create session with retry logic"""
+    session = requests.Session()
+    retry = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
+
 def create_output_dir():
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
@@ -42,9 +58,9 @@ def sanitize_filename(title):
         title = title.replace(char, '_')
     return title[:100].strip() + ".pdf"
 
-def download_pdf(url, filename):
+def download_pdf(session, url, filename):
     try:
-        response = requests.get(url, stream=True, timeout=30)
+        response = session.get(url, headers=HEADERS, stream=True, timeout=30)
         if 'pdf' not in response.headers.get('Content-Type', '').lower():
             return False
         
@@ -66,6 +82,7 @@ def main():
     print("=" * 60)
     
     create_output_dir()
+    session = create_session()
     
     total_downloaded = 0
     total_skipped = 0
@@ -78,37 +95,53 @@ def main():
         try:
             # Hit the browse endpoint with offset
             url = f"{BASE_URL}/handle/123456789/1362/browse?offset={offset}"
-            response = requests.get(url, timeout=30)
+            response = session.get(url, headers=HEADERS, timeout=30)
             soup = BeautifulSoup(response.content, 'html.parser')
             
             links_found_on_page = 0
+            all_links = []
             
-            # Find all Act links
+            # Find all Act links (BROADER SEARCH)
             for link in soup.find_all('a', href=True):
                 href = link['href']
-                if '/show/' in href or '/bitstream/' in href:
-                    full_url = BASE_URL + href if not href.startswith('http') else href
-                    title = link.text.strip()
-                    
-                    if not title: 
-                        continue
-                    
-                    filename = sanitize_filename(title)
-                    filepath = os.path.join(OUTPUT_DIR, filename)
-                    
-                    # Skip if already exists (Time Saver!)
-                    if os.path.exists(filepath):
-                        print(f"  [SKIP] Already exists: {filename}")
-                        total_skipped += 1
-                        continue
-                        
-                    print(f"  [DOWNLOAD] {filename}")
-                    if download_pdf(full_url, filename):
-                        total_downloaded += 1
-                        links_found_on_page += 1
-                        time.sleep(1)  # Be polite to server
+                # Check for PDFs, download links, show pages, or bitstream
+                if (href.lower().endswith('.pdf') or 
+                    'download' in href.lower() or 
+                    '/show/' in href or 
+                    '/bitstream/' in href):
+                    all_links.append((href, link.text.strip()))
             
-            if links_found_on_page == 0:
+            # DEBUG: if no links found, print page info
+            if len(all_links) == 0:
+                print(f"\n⚠️ DEBUG: No links found on page {page + 1}")
+                if soup.title:
+                    print(f"Page Title: {soup.title.text.strip()}")
+                print(f"First 500 chars of HTML:\n{soup.prettify()[:500]}\n")
+                break
+            
+            # Process found links
+            for href, title in all_links:
+                full_url = BASE_URL + href if not href.startswith('http') else href
+                
+                if not title: 
+                    continue
+                
+                filename = sanitize_filename(title)
+                filepath = os.path.join(OUTPUT_DIR, filename)
+                
+                # Skip if already exists (Time Saver!)
+                if os.path.exists(filepath):
+                    print(f"  [SKIP] Already exists: {filename}")
+                    total_skipped += 1
+                    continue
+                    
+                print(f"  [DOWNLOAD] {filename}")
+                if download_pdf(session, full_url, filename):
+                    total_downloaded += 1
+                    links_found_on_page += 1
+                    time.sleep(1)  # Be polite to server
+            
+            if links_found_on_page == 0 and len(all_links) == 0:
                 print("[INFO] No more new links found. Stopping.")
                 break
             
