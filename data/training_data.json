@@ -1,0 +1,27 @@
+[
+  {
+    "instruction": "Draft a rental agreement for residential property",
+    "input": "Property: 2BHK apartment in Mumbai, Rent: Rs 25,000/month, Tenant: John Doe, Landlord: Jane Smith",
+    "output": "RENTAL AGREEMENT\n\nThis Rental Agreement is made on [DATE] between:\n\nLANDLORD: Jane Smith\nAddress: [LANDLORD ADDRESS]\n\nTENANT: John Doe\nAddress: [TENANT ADDRESS]\n\nPROPERTY DETAILS:\n- Type: 2BHK Residential Apartment\n- Location: Mumbai\n- Monthly Rent: Rs. 25,000/-\n\nTERMS AND CONDITIONS:\n1. The tenancy period shall be for 11 months\n2. Rent shall be paid by 5th of every month\n3. Security deposit of Rs. 50,000/- to be paid in advance\n4. Tenant shall maintain the property in good condition\n5. No subletting without landlord's written consent\n\nThis agreement is governed by Indian law.\n\nLandlord Signature: ________________\nTenant Signature: ________________"
+  },
+  {
+    "instruction": "Explain Section 420 of Indian Penal Code",
+    "input": "",
+    "output": "Section 420 of the Indian Penal Code deals with 'Cheating and dishonestly inducing delivery of property'.\n\nKey Elements:\n1. Cheating (as defined in Section 415)\n2. Dishonestly inducing someone to deliver property\n3. Intent to cause wrongful gain or loss\n\nPunishment:\n- Imprisonment up to 7 years\n- Fine, or both\n\nThis section is commonly used in fraud cases, financial scams, and breach of trust matters. The prosecution must prove both the act of cheating and the dishonest intention to secure conviction."
+  },
+  {
+    "instruction": "Draft a legal notice for property dispute",
+    "input": "Client wants to send notice to neighbor for illegal construction affecting their property rights",
+    "output": "LEGAL NOTICE\n\nTO: [NEIGHBOR'S NAME]\nAddress: [NEIGHBOR'S ADDRESS]\n\nUNDER SECTION 80 OF CODE OF CIVIL PROCEDURE, 1908\n\nSir/Madam,\n\nI, [CLIENT NAME], through my advocate, hereby serve you this legal notice for the following:\n\n1. You have undertaken illegal construction on your property without proper approvals\n2. Said construction violates building bylaws and affects my client's property rights\n3. The construction blocks natural light and air to my client's property\n\nDEMAND:\nYou are hereby called upon to:\n1. Stop all illegal construction immediately\n2. Demolish the unauthorized portions within 15 days\n3. Pay compensation of Rs. [AMOUNT] for damages caused\n\nFailing compliance within 15 days, my client will be constrained to initiate appropriate legal proceedings against you for damages and injunctive relief.\n\nAdvocate for [CLIENT NAME]\nDate: [DATE]"
+  },
+  {
+    "instruction": "Explain Article 21 of Indian Constitution",
+    "input": "",
+    "output": "Article 21 of the Indian Constitution guarantees the 'Right to Life and Personal Liberty'.\n\nText: 'No person shall be deprived of his life or personal liberty except according to procedure established by law.'\n\nKey Aspects:\n1. Fundamental Right under Part III\n2. Available to all persons (citizens and non-citizens)\n3. Cannot be suspended even during emergency\n\nJudicial Interpretation:\n- Right to life includes right to live with dignity\n- Encompasses right to livelihood, health, education\n- Procedure must be fair, just and reasonable\n- Includes right to privacy, clean environment\n\nLandmark Cases:\n- Maneka Gandhi v. Union of India (1978)\n- Francis Coralie Mullin v. Administrator (1981)\n\nThis article forms the cornerstone of human rights protection in India."
+  },
+  {
+    "instruction": "Draft a simple will document",
+    "input": "Testator: Ram Kumar, Assets: House in Delhi worth 50 lakhs, Bank balance 10 lakhs, Beneficiary: Son Shyam Kumar",
+    "output": "LAST WILL AND TESTAMENT\n\nI, Ram Kumar, son of [FATHER'S NAME], aged [AGE] years, residing at [ADDRESS], being of sound mind and memory, do hereby make this my Last Will and Testament.\n\n1. REVOCATION: I hereby revoke all previous wills and codicils made by me.\n\n2. APPOINTMENT OF EXECUTOR: I appoint my son Shyam Kumar as the sole executor of this will.\n\n3. BEQUESTS:\n   a) My residential house located at [ADDRESS], Delhi, valued at Rs. 50,00,000/- to my son Shyam Kumar\n   b) All my bank accounts and deposits totaling Rs. 10,00,000/- to my son Shyam Kumar\n   c) All other movable and immovable properties to my son Shyam Kumar\n\n4. DEBTS: All my debts and liabilities shall be paid from my estate before distribution.\n\n5. This will shall be governed by Indian Succession Act, 1925.\n\nIN WITNESS WHEREOF, I have signed this will on [DATE] in the presence of two witnesses.\n\nTestator: _________________ (Ram Kumar)\n\nWitness 1: _________________\nWitness 2: _________________"
+  }
+]
