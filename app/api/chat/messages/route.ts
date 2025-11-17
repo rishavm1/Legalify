@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/db';
+import { Encryption } from '@/lib/encryption';
 
 export async function GET(request: NextRequest) {
   try {
@@ -36,7 +37,13 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json({ messages: messages || [] });
+    // Decrypt messages
+    const decryptedMessages = (messages || []).map(msg => ({
+      ...msg,
+      content: msg.metadata?.encrypted ? Encryption.decrypt(msg.content) : msg.content
+    }));
+
+    return NextResponse.json({ messages: decryptedMessages });
   } catch (error) {
     console.error('Failed to fetch messages:', error);
     return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 });

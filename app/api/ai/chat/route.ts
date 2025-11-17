@@ -6,6 +6,8 @@ import type { AIMessage } from '@/lib/ai/types';
 import { citationSystem } from '@/lib/ai/citation-system';
 import { grammarChecker } from '@/lib/ai/grammar-checker';
 import { AuditLogger } from '@/lib/audit-logger';
+import { Encryption } from '@/lib/encryption';
+import { PerformanceMonitor } from '@/lib/performance-monitor';
 
 // Dynamic import for server-side only
 let aiLoadBalancer: any = null;
@@ -16,6 +18,7 @@ if (typeof window === 'undefined') {
 }
 
 export async function POST(request: NextRequest) {
+  const startTime = PerformanceMonitor.startTimer();
   try {
     const session = await getServerSession(authOptions);
     console.log('Chat API - Session:', session?.user);
@@ -56,24 +59,26 @@ export async function POST(request: NextRequest) {
     // Generate AI response with load balancer
     const aiResponse = await generateAIResponseWithLoadBalancer(message, context);
 
-    // Save user message
+    // Encrypt and save user message
+    const encryptedUserMessage = Encryption.encrypt(message);
     await supabaseAdmin
       .from('chat_messages')
       .insert({
         session_id: sessionId,
         role: 'user',
-        content: message,
-        metadata: { fileContext }
+        content: encryptedUserMessage,
+        metadata: { fileContext, encrypted: true }
       });
 
-    // Save AI response
+    // Encrypt and save AI response
+    const encryptedAIResponse = Encryption.encrypt(aiResponse);
     await supabaseAdmin
       .from('chat_messages')
       .insert({
         session_id: sessionId,
         role: 'assistant',
-        content: aiResponse,
-        metadata: {}
+        content: encryptedAIResponse,
+        metadata: { encrypted: true }
       });
 
     // Update session
@@ -91,8 +96,10 @@ export async function POST(request: NextRequest) {
       metadata: { messageLength: message.length, hasFileContext: !!fileContext }
     });
 
+    await PerformanceMonitor.recordMetric(startTime, '/api/ai/chat', 'POST', 200, session.user.id);
     return NextResponse.json({ response: aiResponse });
   } catch (error) {
+    await PerformanceMonitor.recordMetric(startTime, '/api/ai/chat', 'POST', 500);
     return NextResponse.json({ error: 'Failed to process chat' }, { status: 500 });
   }
 }
