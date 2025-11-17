@@ -11,38 +11,50 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     const audioFile = formData.get('audio') as File;
-    const language = formData.get('language') as string || 'en-IN';
 
     if (!audioFile) {
       return NextResponse.json({ error: 'No audio file provided' }, { status: 400 });
     }
 
-    // Convert audio to base64
-    const arrayBuffer = await audioFile.arrayBuffer();
-    const base64Audio = Buffer.from(arrayBuffer).toString('base64');
+    if (!process.env.HUGGINGFACE_API_KEY) {
+      return NextResponse.json({ error: 'HuggingFace API key not configured' }, { status: 500 });
+    }
 
-    // Call Google Speech-to-Text API
+    // Convert audio file to buffer
+    const audioBuffer = await audioFile.arrayBuffer();
+
+    // Use HuggingFace Whisper model (FREE!)
     const response = await fetch(
-      `https://speech.googleapis.com/v1/speech:recognize?key=${process.env.GOOGLE_AI_API_KEY}`,
+      'https://api-inference.huggingface.co/models/openai/whisper-large-v3',
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          config: {
-            encoding: 'WEBM_OPUS',
-            sampleRateHertz: 48000,
-            languageCode: language,
-            enableAutomaticPunctuation: true,
-          },
-          audio: { content: base64Audio },
-        }),
+        headers: {
+          'Authorization': `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
+          'Content-Type': 'audio/webm',
+        },
+        body: audioBuffer,
       }
     );
 
-    const data = await response.json();
-    const transcript = data.results?.[0]?.alternatives?.[0]?.transcript || '';
+    if (!response.ok) {
+      const errorText = await response.text();
+      return NextResponse.json({ 
+        error: `Speech recognition failed: ${errorText}` 
+      }, { status: 500 });
+    }
 
-    return NextResponse.json({ success: true, transcript });
+    const data = await response.json();
+    
+    if (!data.text || !data.text.trim()) {
+      return NextResponse.json({ 
+        error: 'No speech detected. Please speak clearly and try again.' 
+      }, { status: 400 });
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      transcript: data.text.trim() 
+    });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
