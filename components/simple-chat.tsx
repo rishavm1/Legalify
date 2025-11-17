@@ -140,12 +140,19 @@ export function SimpleChat() {
                 }`}>
                   <div className="whitespace-pre-wrap">{message.content}</div>
                   {message.sources && message.sources.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-white/20">
-                      <div className="text-sm text-neutral-300">
-                        <strong>📚 Sources:</strong>
-                        <ul className="mt-1 space-y-1">
+                    <div className="mt-4 pt-4 border-t-2 border-yellow-500/50">
+                      <div className="bg-yellow-900/30 p-3 rounded-lg">
+                        <div className="text-sm font-semibold text-yellow-300 mb-2">
+                          📚 Legal Sources:
+                        </div>
+                        <ul className="space-y-2">
                           {message.sources.map((source, index) => (
-                            <li key={index} className="text-xs">• {source}</li>
+                            <li 
+                              key={index} 
+                              className="text-sm text-yellow-100 bg-yellow-900/20 p-2 rounded border-l-4 border-yellow-500"
+                            >
+                              • {source}
+                            </li>
                           ))}
                         </ul>
                       </div>
