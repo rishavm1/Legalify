@@ -5,9 +5,26 @@ Downloads 1000+ acts with pagination support
 """
 
 import os
-import requests
-from bs4 import BeautifulSoup
+import sys
 import time
+
+# Check for required dependencies
+try:
+    import requests
+    from bs4 import BeautifulSoup
+except ImportError as e:
+    print("\n" + "="*60)
+    print("[ERROR] Missing Required Libraries!")
+    print("="*60)
+    print("\nThe scraper needs 'beautifulsoup4' and 'requests' to work.")
+    print("\nPlease install them using ONE of these commands:\n")
+    print("  Option 1: python -m pip install beautifulsoup4 requests")
+    print("  Option 2: pip install beautifulsoup4 requests")
+    print("  Option 3: pip install -r requirements.txt")
+    print("\n" + "="*60)
+    print(f"\nMissing module: {e.name}")
+    print("="*60 + "\n")
+    sys.exit(1)
 
 # CONFIGURATION
 OUTPUT_DIR = "data/acts"

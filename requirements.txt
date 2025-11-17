@@ -1,0 +1,15 @@
+# Legalify RAG System - Python Dependencies
+
+# Web Scraping
+beautifulsoup4==4.14.2
+requests==2.32.5
+
+# Optional: Advanced RAG (if you want to use InLegalBERT)
+# langchain-community
+# langchain-huggingface
+# faiss-cpu
+# sentence-transformers
+
+# Optional: Flask Backend
+# flask
+# flask-cors
