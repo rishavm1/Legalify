@@ -1,0 +1,43 @@
+{
+  "civil_petition": {
+    "name": "Civil Petition Template",
+    "content": "IN THE COURT OF {COURT_NAME}\nAT {PLACE}\n\nCIVIL SUIT NO. _____ OF {YEAR}\n\n{PLAINTIFF_NAME}\n                                                    ...Plaintiff\nVERSUS\n\n{DEFENDANT_NAME}\n                                                    ...Defendant\n\nPLAINT UNDER ORDER VII RULE 1 CPC\n\nThe Plaintiff most respectfully submits:\n\n1. PARTIES: {PARTY_DETAILS}\n2. FACTS: {FACTS}\n3. CAUSE OF ACTION: {CAUSE_OF_ACTION}\n4. RELIEF SOUGHT: {RELIEF}\n\nPlace: {PLACE}\nDate: {DATE}\n                                                    Plaintiff",
+    "fields": [
+      "COURT_NAME",
+      "PLACE",
+      "YEAR",
+      "PLAINTIFF_NAME",
+      "DEFENDANT_NAME",
+      "PARTY_DETAILS",
+      "FACTS",
+      "CAUSE_OF_ACTION",
+      "RELIEF",
+      "DATE"
+    ]
+  },
+  "bail_application": {
+    "name": "Bail Application Template",
+    "content": "IN THE COURT OF {COURT_NAME}\n\nBAIL APPLICATION NO. _____ OF {YEAR}\nIN FIR NO. {FIR_NUMBER}\n\n{APPLICANT_NAME}\n                                                    ...Applicant\nVERSUS\n\nSTATE OF {STATE}\n                                                    ...Respondent\n\nAPPLICATION FOR GRANT OF BAIL\n\nThe Applicant submits:\n1. The applicant has been falsely implicated.\n2. The applicant is innocent.\n3. The applicant will abide by all conditions.\n\nPRAYER: Grant bail to the applicant.\n\nDate: {DATE}\n                                                    Applicant",
+    "fields": [
+      "COURT_NAME",
+      "YEAR",
+      "FIR_NUMBER",
+      "APPLICANT_NAME",
+      "STATE",
+      "DATE"
+    ]
+  },
+  "legal_notice": {
+    "name": "Legal Notice Template",
+    "content": "LEGAL NOTICE\n\nTo,\n{RECIPIENT_NAME}\n{RECIPIENT_ADDRESS}\n\nDear Sir/Madam,\n\nSUBJECT: {SUBJECT}\n\nOn behalf of my client {CLIENT_NAME}, I serve you this legal notice.\n\n{NOTICE_CONTENT}\n\nYou are called upon to {DEMAND} within 15 days.\n\nFailing which, legal action will be initiated.\n\nYours faithfully,\n{ADVOCATE_NAME}\nAdvocate for {CLIENT_NAME}",
+    "fields": [
+      "RECIPIENT_NAME",
+      "RECIPIENT_ADDRESS",
+      "SUBJECT",
+      "CLIENT_NAME",
+      "NOTICE_CONTENT",
+      "DEMAND",
+      "ADVOCATE_NAME"
+    ]
+  }
+}
