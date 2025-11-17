@@ -10,6 +10,8 @@ import CinematicThemeSwitcher from '@/components/ui/cinematic-theme-switcher';
 import TetrisLoading from '@/components/ui/tetris-loader';
 import { FeatureButtons } from '@/components/feature-buttons';
 import { UsageDashboard } from '@/components/usage-dashboard';
+import { VoiceInputButton } from '@/components/VoiceInputButton';
+import { LanguageSelectorButton } from '@/components/LanguageSelectorButton';
 
 interface ChatSession {
   id: string;
@@ -455,7 +457,7 @@ export function ChatInterface() {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Top Bar */}
-        <div className="flex items-center p-4 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black">
+        <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black">
           <Button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             variant="ghost"
@@ -464,6 +466,10 @@ export function ChatInterface() {
           >
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </Button>
+          
+          <div className="flex items-center gap-2">
+            <LanguageSelectorButton />
+          </div>
         </div>
         
         {showAgreementWorkflow ? (
@@ -752,6 +758,12 @@ export function ChatInterface() {
 
             {/* Input Area */}
             <div className="border-t border-white/10 p-4 md:p-6 bg-gradient-to-r from-black/50 to-neutral-900/50 backdrop-blur-xl">
+              <div className="flex items-center gap-2 mb-4">
+                <VoiceInputButton onInputReceived={(text) => {
+                  setInputMessage(text);
+                }} />
+              </div>
+              
               <FeatureButtons onFeatureClick={async (feature) => {
                 if (feature === 'dashboard') {
                   setShowDashboard(true);
