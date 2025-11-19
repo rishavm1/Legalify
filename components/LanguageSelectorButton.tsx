@@ -10,7 +10,11 @@ const LANGUAGES = {
   'pa': { name: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
 };
 
-export function LanguageSelectorButton() {
+interface LanguageSelectorButtonProps {
+  onLanguageChange?: (language: string) => void;
+}
+
+export function LanguageSelectorButton({ onLanguageChange }: LanguageSelectorButtonProps) {
   const [language, setLanguage] = useState('en');
   const [showMenu, setShowMenu] = useState(false);
 
@@ -24,6 +28,11 @@ export function LanguageSelectorButton() {
     setLanguage(newLang);
     setShowMenu(false);
     localStorage.setItem('language', newLang);
+    
+    // Notify parent component
+    if (onLanguageChange) {
+      onLanguageChange(newLang);
+    }
     
     // Map to voice recognition language codes
     const langMap: Record<string, string> = {

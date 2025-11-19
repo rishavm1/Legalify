@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, ArrowRight, FileText } from 'lucide-react';
+import { ArrowLeft, FileText, X } from 'lucide-react';
 
 interface Question {
   id: string;
@@ -21,34 +21,38 @@ interface AgreementWorkflow {
   template: string;
 }
 
-const agreementTypes = [
+export const agreementTypes = [
   {
     id: 'land-builder',
     name: 'Land Owner - Builder Agreement',
     description: 'Agreement between property owner and construction company',
     category: 'property',
-    icon: '🏗️'
+    icon: '🏗️',
+    keywords: ['land', 'builder', 'construction', 'development']
   },
   {
     id: 'rental',
     name: 'Rental Agreement',
     description: 'Lease agreement for residential or commercial property',
     category: 'property',
-    icon: '🏠'
+    icon: '🏠',
+    keywords: ['rent', 'lease', 'tenant', 'landlord', 'rental']
   },
   {
     id: 'partnership',
     name: 'Partnership Agreement',
     description: 'Business partnership between two or more parties',
     category: 'business',
-    icon: '🤝'
+    icon: '🤝',
+    keywords: ['partner', 'partnership', 'business', 'joint venture']
   },
   {
     id: 'service',
     name: 'Service Agreement',
     description: 'Contract for professional services',
     category: 'business',
-    icon: '💼'
+    icon: '💼',
+    keywords: ['service', 'consulting', 'freelance', 'contractor']
   }
 ];
 
@@ -107,14 +111,19 @@ const serviceQuestions: Question[] = [
 interface Props {
   onDocumentGenerated: (document: string) => void;
   onBack: () => void;
+  initialType?: string | null;
 }
 
-export function AgreementWorkflow({ onDocumentGenerated, onBack }: Props) {
-  const [stage, setStage] = useState<'select' | 'questions' | 'generating' | 'result'>('select');
-  const [selectedType, setSelectedType] = useState<string | null>(null);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+export function AgreementWorkflow({ onDocumentGenerated, onBack, initialType }: Props) {
+  const [selectedType, setSelectedType] = useState<string | null>(initialType || null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState(false);
+
+  useEffect(() => {
+    if (initialType) {
+      setSelectedType(initialType);
+    }
+  }, [initialType]);
 
   const getCurrentQuestions = (): Question[] => {
     switch (selectedType) {
@@ -126,37 +135,12 @@ export function AgreementWorkflow({ onDocumentGenerated, onBack }: Props) {
     }
   };
 
-  const handleTypeSelect = (typeId: string) => {
-    setSelectedType(typeId);
-    setStage('questions');
-    setCurrentQuestionIndex(0);
-    setAnswers({});
-  };
-
   const handleAnswerChange = (questionId: string, value: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
   };
 
-  const handleNext = () => {
-    const questions = getCurrentQuestions();
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-    } else {
-      generateDocument();
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
-    } else {
-      setStage('select');
-    }
-  };
-
   const generateDocument = async () => {
     setIsGenerating(true);
-    setStage('generating');
     
     try {
       // Simulate document generation
@@ -237,154 +221,138 @@ export function AgreementWorkflow({ onDocumentGenerated, onBack }: Props) {
     }
   };
 
-  if (stage === 'generating' || isGenerating) {
+  if (isGenerating) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6 fade-in">
-        <div className="relative">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-amber-400/20 border-t-amber-400 shadow-lg shadow-amber-400/20"></div>
-          <div className="absolute inset-0 rounded-full h-16 w-16 border-4 border-blue-500/20 border-b-blue-500 animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="bg-neutral-900 border border-white/10 rounded-2xl p-10 text-center max-w-md w-full mx-4 shadow-2xl">
+          <div className="relative mb-6 inline-block">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-amber-400/20 border-t-amber-400 shadow-lg shadow-amber-400/20"></div>
+            <div className="absolute inset-0 rounded-full h-16 w-16 border-4 border-blue-500/20 border-b-blue-500 animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
+          </div>
+          <p className="text-white text-2xl font-semibold mb-2">Drafting Document</p>
+          <p className="text-neutral-400 text-base">Creating a comprehensive legal agreement based on your inputs...</p>
         </div>
-        <p className="text-white text-2xl font-semibold">Generating your agreement...</p>
-        <p className="text-neutral-400 text-lg">Creating a comprehensive legal document</p>
       </div>
     );
   }
 
-  if (stage === 'select') {
+  if (!selectedType) {
+    // Fallback if no type selected (though ChatInterface handles extraction usually)
     return (
-      <div className="space-y-8 fade-in">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-white mb-3">Select Agreement Type</h2>
-          <p className="text-neutral-400 text-lg">Choose the type of agreement you want to create</p>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-neutral-200 dark:border-neutral-800">
+          <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-black dark:text-white">Select Agreement Type</h2>
+            <button onClick={onBack} className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full">
+              <X className="w-6 h-6 text-black dark:text-white" />
+            </button>
+          </div>
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {agreementTypes.map((type) => (
+              <button
+                key={type.id}
+                onClick={() => setSelectedType(type.id)}
+                className="p-6 text-left bg-neutral-50 dark:bg-neutral-800/50 hover:bg-neutral-100 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl transition-all"
+              >
+                <div className="text-4xl mb-4">{type.icon}</div>
+                <h3 className="text-lg font-bold text-black dark:text-white mb-2">{type.name}</h3>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">{type.description}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const questions = getCurrentQuestions();
+  const allRequiredFilled = questions.filter(q => q.required).every(q => answers[q.id]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
+      <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col border border-neutral-200 dark:border-neutral-800">
+        {/* Header */}
+        <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center bg-white dark:bg-neutral-900 sticky top-0 rounded-t-2xl z-10">
+          <div>
+            <h2 className="text-2xl font-bold text-black dark:text-white flex items-center gap-3">
+              <span>{agreementTypes.find(t => t.id === selectedType)?.icon}</span>
+              {agreementTypes.find(t => t.id === selectedType)?.name}
+            </h2>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">Please fill in the details below to generate your document.</p>
+          </div>
+          <button onClick={onBack} className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-colors">
+            <X className="w-6 h-6 text-black dark:text-white" />
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {agreementTypes.map((type) => (
-            <button
-              key={type.id}
-              onClick={() => handleTypeSelect(type.id)}
-              className="glass-card card-hover glow-border border border-white/10 hover:border-amber-400/50 rounded-2xl p-8 transition-all text-left group shadow-xl hover:shadow-2xl hover:shadow-amber-400/20"
-            >
-              <div className="text-5xl mb-6 transition-transform duration-300 group-hover:scale-110">{type.icon}</div>
-              <h3 className="text-white font-bold text-xl group-hover:text-amber-400 transition-colors mb-3">
-                {type.name}
-              </h3>
-              <p className="text-neutral-400 text-base leading-relaxed">
-                {type.description}
-              </p>
-            </button>
+        {/* Form Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {questions.map((question) => (
+            <div key={question.id} className="space-y-2">
+              <label className="block text-sm font-semibold text-black dark:text-white">
+                {question.text}
+                {question.required && <span className="text-red-500 ml-1">*</span>}
+              </label>
+              
+              {question.type === 'text' && (
+                <input
+                  type="text"
+                  value={answers[question.id] || ''}
+                  onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                  className="w-full p-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-black dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                  placeholder="Enter details..."
+                />
+              )}
+
+              {question.type === 'textarea' && (
+                <Textarea
+                  value={answers[question.id] || ''}
+                  onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                  className="w-full p-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-black dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all min-h-[100px]"
+                  placeholder="Enter address or details..."
+                />
+              )}
+
+              {question.type === 'select' && (
+                <select
+                  value={answers[question.id] || ''}
+                  onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                  className="w-full p-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-black dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                >
+                  <option value="">Select an option...</option>
+                  {question.options?.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              )}
+
+              {question.type === 'number' && (
+                <input
+                  type="number"
+                  value={answers[question.id] || ''}
+                  onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                  className="w-full p-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-black dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                  placeholder="0"
+                />
+              )}
+            </div>
           ))}
         </div>
 
-        <div className="flex justify-center">
-          <Button onClick={onBack} variant="outline" className="premium-button glass-card border-white/20 hover:bg-white/10 rounded-xl px-6 py-3">
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Chat
+        {/* Footer */}
+        <div className="p-6 border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 sticky bottom-0 rounded-b-2xl z-10 flex justify-end gap-3">
+          <Button onClick={onBack} variant="ghost" className="text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800">
+            Cancel
           </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (stage === 'questions') {
-    const questions = getCurrentQuestions();
-    const currentQuestion = questions[currentQuestionIndex];
-    const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
-
-    return (
-      <div className="space-y-8 fade-in">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            {agreementTypes.find(t => t.id === selectedType)?.name}
-          </h2>
-          <div className="w-full bg-neutral-800/50 rounded-full h-3 mb-4 overflow-hidden">
-            <div 
-              className="bg-gradient-to-r from-amber-400 to-amber-600 h-3 rounded-full transition-all duration-500 shadow-lg shadow-amber-400/30"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-          <p className="text-neutral-400 text-lg font-medium">
-            Question {currentQuestionIndex + 1} of {questions.length}
-          </p>
-        </div>
-
-        <div className="glass-card rounded-2xl p-8 border border-white/10 shadow-2xl">
-          <label className="block text-white font-semibold mb-6 text-lg">
-            {currentQuestion.text}
-            {currentQuestion.required && <span className="text-amber-400 ml-2">*</span>}
-          </label>
-
-          {currentQuestion.type === 'text' && (
-            <input
-              type="text"
-              value={answers[currentQuestion.id] || ''}
-              onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
-              className="w-full p-4 glass-card border border-white/20 rounded-xl text-white focus:border-amber-400/50 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all duration-300 font-medium"
-              placeholder="Enter your answer..."
-            />
-          )}
-
-          {currentQuestion.type === 'textarea' && (
-            <Textarea
-              value={answers[currentQuestion.id] || ''}
-              onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
-              className="w-full p-4 glass-card border border-white/20 rounded-xl text-white focus:border-amber-400/50 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all duration-300 font-medium"
-              placeholder="Enter your answer..."
-              rows={4}
-            />
-          )}
-
-          {currentQuestion.type === 'select' && (
-            <select
-              value={answers[currentQuestion.id] || ''}
-              onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
-              className="w-full p-4 glass-card border border-white/20 rounded-xl text-white focus:border-amber-400/50 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all duration-300 font-medium"
-            >
-              <option value="">Select an option...</option>
-              {currentQuestion.options?.map((option) => (
-                <option key={option} value={option} className="bg-neutral-900">{option}</option>
-              ))}
-            </select>
-          )}
-
-          {currentQuestion.type === 'number' && (
-            <input
-              type="number"
-              value={answers[currentQuestion.id] || ''}
-              onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
-              className="w-full p-4 glass-card border border-white/20 rounded-xl text-white focus:border-amber-400/50 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all duration-300 font-medium"
-              placeholder="Enter number..."
-            />
-          )}
-        </div>
-
-        <div className="flex justify-between">
-          <Button onClick={handlePrevious} variant="outline" className="premium-button glass-card border-white/20 hover:bg-white/10 rounded-xl px-6 py-3">
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            {currentQuestionIndex === 0 ? 'Back' : 'Previous'}
-          </Button>
-
           <Button 
-            onClick={handleNext}
-            disabled={currentQuestion.required && !answers[currentQuestion.id]}
-            className="premium-button bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-semibold rounded-xl px-6 py-3 shadow-lg hover:shadow-amber-400/25 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={generateDocument}
+            disabled={!allRequiredFilled || isGenerating}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8"
           >
-            {currentQuestionIndex === questions.length - 1 ? (
-              <>
-                <FileText className="w-5 h-5 mr-2" />
-                Generate Agreement
-              </>
-            ) : (
-              <>
-                Next
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </>
-            )}
+            {isGenerating ? 'Generating...' : 'Generate Document'}
           </Button>
         </div>
       </div>
-    );
-  }
-
-  return null;
+    </div>
+  );
 }

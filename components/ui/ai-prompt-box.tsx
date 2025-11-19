@@ -495,86 +495,27 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
             </PromptInputAction>
           </div>
 
-          <PromptInputAction tooltip={isLoading ? "Stop generation" : hasContent ? "Send message" : "Voice message"}>
+          <PromptInputAction tooltip={isLoading ? "Stop generation" : "Send message"}>
             <Button
               variant="default"
               size="icon"
               className={cn(
                 "h-8 w-8 rounded-full transition-all duration-200",
-                isRecording
-                  ? "bg-transparent hover:bg-neutral-200 dark:hover:bg-gray-600/30 text-red-500 hover:text-red-400"
-                  : hasContent
-                  ? "bg-black dark:bg-white hover:bg-neutral-800 dark:hover:bg-white/80 text-white dark:text-[#1F2023]"
-                  : "bg-transparent hover:bg-neutral-200 dark:hover:bg-gray-600/30 text-neutral-600 dark:text-[#9CA3AF] hover:text-neutral-800 dark:hover:text-[#D1D5DB]"
+                isLoading || !hasContent
+                  ? "bg-transparent text-neutral-400 dark:text-neutral-600 cursor-not-allowed"
+                  : "bg-black dark:bg-white hover:bg-neutral-800 dark:hover:bg-white/80 text-white dark:text-[#1F2023]"
               )}
-              onClick={async () => {
-                if (isRecording) {
-                  // Stop recording
-                  if (mediaRecorderRef.current) {
-                    mediaRecorderRef.current.stop();
-                  }
-                  setIsRecording(false);
-                } else if (hasContent) {
+              onClick={() => {
+                if (hasContent && !isLoading) {
                   handleSubmit();
-                } else {
-                  // Start recording
-                  try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    const mediaRecorder = new MediaRecorder(stream);
-                    mediaRecorderRef.current = mediaRecorder;
-                    chunksRef.current = [];
-
-                    mediaRecorder.ondataavailable = (e) => {
-                      if (e.data.size > 0) chunksRef.current.push(e.data);
-                    };
-
-                    mediaRecorder.onstop = async () => {
-                      setIsProcessingVoice(true);
-                      const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
-                      
-                      try {
-                        const formData = new FormData();
-                        formData.append('audio', audioBlob, 'recording.webm');
-                        formData.append('language', localStorage.getItem('voiceLanguage') || 'en-IN');
-
-                        const response = await fetch('/api/voice', {
-                          method: 'POST',
-                          body: formData,
-                        });
-
-                        const data = await response.json();
-                        if (data.success && data.transcript) {
-                          setInput(data.transcript);
-                        } else {
-                          alert('Could not transcribe audio. Please try again.');
-                        }
-                      } catch (error) {
-                        console.error('Voice API error:', error);
-                        alert('Failed to process voice input');
-                      } finally {
-                        setIsProcessingVoice(false);
-                        stream.getTracks().forEach(track => track.stop());
-                      }
-                    };
-
-                    mediaRecorder.start();
-                    setIsRecording(true);
-                  } catch (error) {
-                    console.error('Microphone error:', error);
-                    alert('Microphone access denied');
-                  }
                 }
               }}
-              disabled={isLoading && !hasContent}
+              disabled={isLoading || !hasContent}
             >
               {isLoading ? (
-                <Square className="h-4 w-4 fill-white dark:fill-[#1F2023] animate-pulse" />
-              ) : isRecording ? (
-                <StopCircle className="h-5 w-5 text-red-500" />
-              ) : hasContent ? (
-                <ArrowUp className="h-4 w-4 text-white dark:text-[#1F2023]" />
+                <Square className="h-4 w-4 fill-current animate-pulse" />
               ) : (
-                <Mic className="h-5 w-5 transition-colors" />
+                <ArrowUp className="h-4 w-4" />
               )}
             </Button>
           </PromptInputAction>

@@ -4,17 +4,25 @@ import React, { useState } from 'react';
 import { VoiceInputButton } from '@/components/VoiceInputButton';
 import { LanguageSelectorButton } from '@/components/LanguageSelectorButton';
 
+interface Message {
+  id: number;
+  type: 'user' | 'ai';
+  content: string;
+  sources?: string[];
+  timestamp: Date;
+}
+
 export function SimpleChat() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [language, setLanguage] = useState('en');
 
-  const sendMessage = async (text) => {
+  const sendMessage = async (text: string) => {
     if (!text.trim()) return;
 
     // Add user message
-    const userMessage = {
+    const userMessage: Message = {
       id: Date.now(),
       type: 'user',
       content: text,
@@ -26,8 +34,8 @@ export function SimpleChat() {
     setIsTyping(true);
 
     try {
-      // Send request to Flask backend
-      const response = await fetch('http://localhost:5000/api/chat', {
+      // Send request to Next.js API
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +53,7 @@ export function SimpleChat() {
       const data = await response.json();
 
       // Add AI response
-      const aiMessage = {
+      const aiMessage: Message = {
         id: Date.now() + 1,
         type: 'ai',
         content: data.response,
@@ -59,10 +67,10 @@ export function SimpleChat() {
       console.error('Error sending message:', error);
       
       // Add error message
-      const errorMessage = {
+      const errorMessage: Message = {
         id: Date.now() + 1,
         type: 'ai',
-        content: 'Sorry, I encountered an error. Please make sure the backend server is running on http://localhost:5000',
+        content: 'Sorry, I encountered an error processing your request. Please try again.',
         sources: [],
         timestamp: new Date()
       };
@@ -73,17 +81,17 @@ export function SimpleChat() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     sendMessage(inputText);
   };
 
-  const handleVoiceInput = (transcript) => {
+  const handleVoiceInput = (transcript: string) => {
     setInputText(transcript);
     sendMessage(transcript);
   };
 
-  const handleLanguageChange = (newLanguage) => {
+  const handleLanguageChange = (newLanguage: string) => {
     setLanguage(newLanguage);
   };
 

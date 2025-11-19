@@ -38,10 +38,19 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
 
     // Decrypt messages
-    const decryptedMessages = (messages || []).map(msg => ({
-      ...msg,
-      content: msg.metadata?.encrypted ? Encryption.decrypt(msg.content) : msg.content
-    }));
+    const decryptedMessages = (messages || []).map(msg => {
+      try {
+        // Try to decrypt - if it fails, return original content
+        const decrypted = Encryption.decrypt(msg.content);
+        return {
+          ...msg,
+          content: decrypted
+        };
+      } catch (error) {
+        // If decryption fails, return original content
+        return msg;
+      }
+    });
 
     return NextResponse.json({ messages: decryptedMessages });
   } catch (error) {
@@ -59,13 +68,14 @@ export async function POST(request: NextRequest) {
 
     const { sessionId, role, content, metadata } = await request.json();
 
+    // Store messages without encryption for better readability
     const { data: message, error } = await supabaseAdmin
       .from('chat_messages')
       .insert({
         session_id: sessionId,
         role,
-        content,
-        metadata: metadata || {}
+        content, // Store as plain text
+        metadata: { ...metadata, encrypted: false }
       })
       .select()
       .single();
